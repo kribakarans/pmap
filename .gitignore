@@ -1,0 +1,5 @@
+*.sw*
+*.out
+*.maps
+*.regs
+crash_demo

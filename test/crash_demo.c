@@ -3,19 +3,96 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <ucontext.h>
+#include <sys/ucontext.h>
 
-/* Signal handler to capture memory map before exit */
-void signal_handler(int sig) {
+/* Print register values based on architecture */
+void print_registers(ucontext_t *context, FILE *fp) {
+    if (!context) return;
+    
+    mcontext_t *mctx = &context->uc_mcontext;
+    
+#ifdef __x86_64__
+    /* x86-64 registers using gregs array indices */
+    fprintf(fp, "=== CPU REGISTERS (x86-64) ===\n");
+    fprintf(fp, "rip: %016lx (Program Counter - where crash occurred)\n", mctx->gregs[16]);  /* REG_RIP */
+    fprintf(fp, "rsp: %016lx (Stack Pointer)\n", mctx->gregs[15]);  /* REG_RSP */
+    fprintf(fp, "rbp: %016lx (Frame Pointer)\n", mctx->gregs[10]);  /* REG_RBP */
+    fprintf(fp, "rax: %016lx\n", mctx->gregs[13]);  /* REG_RAX */
+    fprintf(fp, "rbx: %016lx\n", mctx->gregs[11]);  /* REG_RBX */
+    fprintf(fp, "rcx: %016lx\n", mctx->gregs[14]);  /* REG_RCX */
+    fprintf(fp, "rdx: %016lx\n", mctx->gregs[12]);  /* REG_RDX */
+    fprintf(fp, "rsi: %016lx\n", mctx->gregs[9]);   /* REG_RSI */
+    fprintf(fp, "rdi: %016lx\n", mctx->gregs[8]);   /* REG_RDI */
+    fprintf(fp, "r8:  %016lx\n", mctx->gregs[0]);   /* REG_R8 */
+    fprintf(fp, "r9:  %016lx\n", mctx->gregs[1]);   /* REG_R9 */
+    fprintf(fp, "r10: %016lx\n", mctx->gregs[2]);   /* REG_R10 */
+    fprintf(fp, "r11: %016lx\n", mctx->gregs[3]);   /* REG_R11 */
+    fprintf(fp, "r12: %016lx\n", mctx->gregs[4]);   /* REG_R12 */
+    fprintf(fp, "r13: %016lx\n", mctx->gregs[5]);   /* REG_R13 */
+    fprintf(fp, "r14: %016lx\n", mctx->gregs[6]);   /* REG_R14 */
+    fprintf(fp, "r15: %016lx\n", mctx->gregs[7]);   /* REG_R15 */
+    
+#elif defined(__aarch64__)
+    /* ARM64 registers */
+    fprintf(fp, "=== CPU REGISTERS (ARM64) ===\n");
+    fprintf(fp, "pc  : %016llx (Program Counter)\n", context->uc_mcontext.pc);
+    fprintf(fp, "lr  : %016llx (Link Register)\n", context->uc_mcontext.regs[30]);
+    fprintf(fp, "sp  : %016llx (Stack Pointer)\n", context->uc_mcontext.sp);
+    for (int i = 0; i < 31; i++) {
+        fprintf(fp, "x%-2d: %016llx", i, context->uc_mcontext.regs[i]);
+        if ((i + 1) % 2 == 0) fprintf(fp, "\n");
+        else fprintf(fp, "  ");
+    }
+    
+#elif defined(__arm__)
+    /* ARM (32-bit) registers */
+    fprintf(fp, "=== CPU REGISTERS (ARM 32-bit) ===\n");
+    fprintf(fp, "pc  : %08x (Program Counter)\n", (unsigned int)mctx->arm_pc);
+    fprintf(fp, "lr  : %08x (Link Register)\n", (unsigned int)mctx->arm_lr);
+    fprintf(fp, "sp  : %08x (Stack Pointer)\n", (unsigned int)mctx->arm_sp);
+    fprintf(fp, "fp  : %08x (Frame Pointer)\n", (unsigned int)mctx->arm_fp);
+    for (int i = 0; i < 16; i++) {
+        fprintf(fp, "r%-2d: %08x", i, (unsigned int)mctx->arm_r[i]);
+        if ((i + 1) % 4 == 0) fprintf(fp, "\n");
+        else fprintf(fp, "  ");
+    }
+    
+#else
+    fprintf(fp, "=== CPU REGISTERS (unknown architecture) ===\n");
+    fprintf(fp, "Register dumping not supported for this architecture\n");
+#endif
+    
+    fprintf(fp, "\n");
+}
+
+/* Signal handler to capture memory map and registers */
+void signal_handler(int sig, siginfo_t *info, void *ctx) {
+    ucontext_t *context = (ucontext_t *)ctx;
     char cmd[512];
+    char regfile[256];
+    FILE *fp;
+    
     printf("\n[CRASH HANDLER] Signal %d caught at PID %d\n", sig, getpid());
+    
+    /* Save registers to file */
+    sprintf(regfile, "crash_dump_%d.regs", getpid());
+    fp = fopen(regfile, "w");
+    if (fp) {
+        fprintf(fp, "=== CRASH CONTEXT ===\n");
+        fprintf(fp, "Signal: %d (%s)\n", sig, sig == SIGSEGV ? "SIGSEGV" : "Unknown");
+        fprintf(fp, "PID: %d\n\n", getpid());
+        
+        print_registers(context, fp);
+        
+        fclose(fp);
+        printf("[CRASH HANDLER] Register dump saved to %s\n", regfile);
+    }
     
     /* Capture memory map */
     sprintf(cmd, "cat /proc/%d/maps > crash_dump_%d.maps 2>&1", getpid(), getpid());
     system(cmd);
     printf("[CRASH HANDLER] Memory map saved to crash_dump_%d.maps\n", getpid());
-    
-    /* Print where we crashed */
-    printf("[CRASH HANDLER] Signal: %s\n", sig == SIGSEGV ? "SIGSEGV" : "SIGABRT");
     
     exit(1);
 }
@@ -52,12 +129,17 @@ int main(int argc, char *argv[]) {
     printf("PID: %d\n", getpid());
     printf("This program will intentionally crash to demonstrate crash analysis.\n\n");
     
-    /* Install signal handlers */
-    signal(SIGSEGV, signal_handler);
-    signal(SIGABRT, signal_handler);
-    signal(SIGFPE, signal_handler);
+    /* Install signal handlers with context (SA_SIGINFO) */
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_sigaction = signal_handler;
+    sa.sa_flags = SA_SIGINFO;
     
-    printf("Signal handlers installed.\n");
+    sigaction(SIGSEGV, &sa, NULL);
+    sigaction(SIGABRT, &sa, NULL);
+    sigaction(SIGFPE, &sa, NULL);
+    
+    printf("Signal handlers installed (with register capture).\n");
     printf("Starting crash chain...\n\n");
     fflush(stdout);
     
