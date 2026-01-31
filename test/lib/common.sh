@@ -9,7 +9,7 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$(cd "$TEST_DIR/.." && pwd)"
 ANALYZER="$PROJECT_DIR/pmap.py"
 HTML_TOOL="$PROJECT_DIR/pmap2html.py"
-SAMPLE_DUMP="$PROJECT_DIR/memmap.txt"
+SAMPLE_DUMP="$TEST_DIR/pmap-sample.txt"
 CRASH_DEMO="$TEST_DIR/crash_demo.out"
 CRASH_SRC="$TEST_DIR/crash_demo.c"
 
@@ -35,7 +35,7 @@ ensure_html_tool() {
 }
 
 ensure_sample_dump() {
-    ensure_file "$SAMPLE_DUMP" "memmap.txt"
+    ensure_file "$SAMPLE_DUMP" "test/pmap-sample.txt"
 }
 
 ensure_crash_demo_compiled() {

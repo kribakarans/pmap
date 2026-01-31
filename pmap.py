@@ -5,6 +5,11 @@ Enhanced visualization and crash context analysis
 """
 
 import sys
+import os
+import signal
+
+# Handle broken pipe gracefully (when output is piped to head/tail)
+signal.signal(signal.SIGPIPE, signal.SIG_IGN)
 
 from lib.api import (
     SegmentType, MemorySegment, MemoryMap, CrashContext,
@@ -17,7 +22,7 @@ def print_help(prog: str):
     print(
         f"""Usage: {prog} <memory_dump_file> [options]
 
-Linux crash analysis tool for /proc/<pid>/maps dumps.
+Visualize /proc/<pid>/maps dumps.
 
 Output Options (each shows only its specific report):
     --report             -- Show all reports (default if no options given)
@@ -37,15 +42,15 @@ Help:
     -h, --help           -- Show this help menu
 
 Examples:
-    {prog} memmap.txt                         # Show all reports
-    {prog} memmap.txt --report                # Show all reports (explicit)
-    {prog} memmap.txt --table                 # Show only table view
-    {prog} memmap.txt --ascii                 # Show only ASCII map
-    {prog} memmap.txt --pc 0xf79e245c         # Show only crash analysis for PC
-    {prog} memmap.txt --stats --security      # Show stats and security reports
+    {prog} test/pmap-sample.txt                         # Show all reports
+    {prog} test/pmap-sample.txt --report                # Show all reports (explicit)
+    {prog} test/pmap-sample.txt --table                 # Show only table view
+    {prog} test/pmap-sample.txt --ascii                 # Show only ASCII map
+    {prog} test/pmap-sample.txt --pc 0xf79e245c         # Show only crash analysis for PC
+    {prog} test/pmap-sample.txt --stats --security      # Show stats and security reports
 
 For HTML visualization:
-    pmap2html.py memmap.txt --pc 0xaddr --html report.html
+    pmap2html.py test/pmap-sample.txt --pc 0xaddr --html report.html
 """
     )
 
@@ -156,4 +161,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except BrokenPipeError:
+        try:
+            sys.stdout.close()
+        finally:
+            os._exit(0)

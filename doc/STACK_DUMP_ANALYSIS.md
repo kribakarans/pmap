@@ -4233,7 +4233,7 @@ CRASH_DIR="crash_analysis_${PID}_$(date +%s)"
 mkdir -p "$CRASH_DIR"
 
 # Capture memory maps
-cp /proc/$PID/maps "$CRASH_DIR/memmap.txt"
+cp /proc/$PID/maps "$CRASH_DIR/test/pmap-sample.txt"
 
 # Capture process info
 cat /proc/$PID/status > "$CRASH_DIR/process_status.txt"
@@ -4242,7 +4242,7 @@ cat /proc/$PID/status > "$CRASH_DIR/process_status.txt"
 cat /proc/$PID/smaps > "$CRASH_DIR/detailed_maps.txt"
 
 # Analyze memory map
-python3 pmap.py "$CRASH_DIR/memmap.txt" --report
+python3 pmap.py "$CRASH_DIR/test/pmap-sample.txt" --report
 
 echo "Analysis saved to: $CRASH_DIR/"
 ```
@@ -4846,7 +4846,7 @@ while true; do
         mkdir -p $CRASH_SUBDIR
         
         # Collect data
-        cp /proc/self/maps "$CRASH_SUBDIR/memmap.txt"
+        cp /proc/self/maps "$CRASH_SUBDIR/test/pmap-sample.txt"
         
         # Find and copy core dump
         CORE=$(ls -t core.* 2>/dev/null | head -1)
@@ -4855,7 +4855,7 @@ while true; do
         fi
         
         # Analyze
-        python3 pmap.py "$CRASH_SUBDIR/memmap.txt" \
+        python3 pmap.py "$CRASH_SUBDIR/test/pmap-sample.txt" \
             --html "$CRASH_SUBDIR/analysis.html"
         
         echo "Crash recorded: $CRASH_SUBDIR"

@@ -61,25 +61,25 @@ chmod +x pmap.py
 
 ### 1. Basic Analysis
 ```bash
-./pmap.py memmap.txt
+./pmap.py test/pmap-sample.txt
 ```
 Shows: Table, Statistics, Grouped by Binary, ASCII Layout, Security Check
 
 ### 2. Analyze a Crash (Program Counter)
 ```bash
-./pmap.py memmap.txt --pc 0xf79e245c
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c
 ```
 Shows which binary crashed and at what offset
 
 ### 3. Analyze Link Register (Call Stack)
 ```bash
-./pmap.py memmap.txt --lr 0xf79e7f10
+./pmap.py test/pmap-sample.txt --lr 0xf79e7f10
 ```
 Shows where the crashing function will return to
 
 ### 4. Full Crash Context
 ```bash
-./pmap.py memmap.txt \
+./pmap.py test/pmap-sample.txt \
   --pc 0xf79e245c \
   --lr 0xf79e7f10 \
   --sp 0xff8b0000 \
@@ -88,7 +88,7 @@ Shows where the crashing function will return to
 
 ### 5. Generate HTML Report
 ```bash
-./pmap.py memmap.txt --html crash_report.html
+./pmap.py test/pmap-sample.txt --html crash_report.html
 ```
 
 ---
@@ -121,23 +121,23 @@ Crash Analysis Options (shows crash context analysis only):
 
 ```bash
 # All views combined
-./pmap.py memmap.txt
+./pmap.py test/pmap-sample.txt
 
 # Specific views
-./pmap.py memmap.txt --segments         # Segment overview only
-./pmap.py memmap.txt --ascii            # ASCII layout only
-./pmap.py memmap.txt --table            # Table view only
-./pmap.py memmap.txt --stats            # Statistics only
+./pmap.py test/pmap-sample.txt --segments         # Segment overview only
+./pmap.py test/pmap-sample.txt --ascii            # ASCII layout only
+./pmap.py test/pmap-sample.txt --table            # Table view only
+./pmap.py test/pmap-sample.txt --stats            # Statistics only
 
 # Crash analysis (combinable)
-./pmap.py memmap.txt --pc 0xf79e245c                    # PC only
-./pmap.py memmap.txt --lr 0xf79e7f10                    # LR only
-./pmap.py memmap.txt --sp 0xff8b0000                    # SP only
-./pmap.py memmap.txt --pc 0x... --lr 0x... --sp 0x...  # Multiple
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c                    # PC only
+./pmap.py test/pmap-sample.txt --lr 0xf79e7f10                    # LR only
+./pmap.py test/pmap-sample.txt --sp 0xff8b0000                    # SP only
+./pmap.py test/pmap-sample.txt --pc 0x... --lr 0x... --sp 0x...  # Multiple
 
 # HTML reports
-./pmap.py memmap.txt --html                              # Default filename
-./pmap.py memmap.txt --pc 0xf79e245c --html report.html  # Custom filename
+./pmap.py test/pmap-sample.txt --html                              # Default filename
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c --html report.html  # Custom filename
 
 # Help
 ./pmap.py --help
@@ -276,7 +276,7 @@ TOTAL           105         3,932,160 bytes  100.00%
 ### Samples & Tests
 | File | Purpose |
 |------|---------|
-| [memmap.txt](memmap.txt) | Sample memory dump |
+| [test/pmap-sample.txt](test/pmap-sample.txt) | Sample memory dump |
 | [test/crash_demo.c](test/crash_demo.c) | Test program (crashes intentionally) |
 | [test/test_all.sh](test/test_all.sh) | Comprehensive crash analysis tests |
 | [test/test_analyser.sh](test/test_analyser.sh) | Unit test suite |
@@ -370,7 +370,7 @@ cat /proc/<pid>/maps > memdump.txt
 
 ```bash
 # Option 1: From running process
-cat /proc/<pid>/maps > crash_memmap.txt
+cat /proc/<pid>/maps > crash_test/pmap-sample.txt
 
 # Option 2: Via GDB
 gdb ./myprogram
@@ -442,7 +442,7 @@ addr2line -e /lib/libubus.so.20230605 0x245c -f
 
 ### Data Flow
 ```
-Memory Dump (memmap.txt)
+Memory Dump (test/pmap-sample.txt)
     ↓
 Parser
     ↓
@@ -463,13 +463,13 @@ User reads findings
 
 ```bash
 # Show only specific tables
-./pmap.py memmap.txt --table --stats
+./pmap.py test/pmap-sample.txt --table --stats
 
 # Multiple registers
-./pmap.py memmap.txt --pc 0x... --lr 0x... --sp 0x... --fp 0x...
+./pmap.py test/pmap-sample.txt --pc 0x... --lr 0x... --sp 0x... --fp 0x...
 
 # HTML with crash context
-./pmap.py memmap.txt --pc 0xf79e245c --html crash_report.html
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c --html crash_report.html
 ```
 
 ### Security Checks
@@ -551,7 +551,7 @@ Complete testing guide with real-world workflows and examples.
 **Q: "File not found" error**
 A: Ensure the memory dump file path is correct:
 ```bash
-./pmap.py ./memmap.txt
+./pmap.py ./test/pmap-sample.txt
 ```
 
 **Q: addr2line shows "??" for symbols**
@@ -604,7 +604,7 @@ Possible additions:
 
 ✓ **1 powerful tool** (pmap.py - 1,302 lines)  
 ✓ **Comprehensive documentation** (README, USAGE, TESTING, MEMORY_MAPS, STACK_DUMP_ANALYSIS)  
-✓ **Working examples** (memmap.txt, crash_demo.c)  
+✓ **Working examples** (test/pmap-sample.txt, crash_demo.c)  
 ✓ **Automated test suite** (test_all.sh)  
 
 **Perfect for:**

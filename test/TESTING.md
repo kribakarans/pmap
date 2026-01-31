@@ -104,7 +104,7 @@ gcc -g -O0 crash_demo.c -o crash_demo
 gdb ./crash_demo
 (gdb) run
 # Program crashes with SIGSEGV
-(gdb) shell cat /proc/$(pgrep -f "crash_demo")/maps > crash_memmap.txt
+(gdb) shell cat /proc/$(pgrep -f "crash_demo")/maps > crash_test/pmap-sample.txt
 (gdb) info registers
 # Note the PC, LR, SP values
 (gdb) quit
@@ -170,7 +170,7 @@ If you know the PID, capture the map in another terminal:
 ./crash_demo
 
 # Terminal 2: Capture its memory map
-cat /proc/$(pgrep crash_demo)/maps > crash_memmap.txt
+cat /proc/$(pgrep crash_demo)/maps > crash_test/pmap-sample.txt
 ```
 
 ---
@@ -221,7 +221,7 @@ void signal_handler(int sig, siginfo_t *info, void *ctx) {
 **Basic Analysis (All Views):**
 
 ```bash
-./pmap.py crash_memmap.txt
+./pmap.py crash_test/pmap-sample.txt
 ```
 
 Output includes:
@@ -233,7 +233,7 @@ Output includes:
 **Find Where the Crash Happened:**
 
 ```bash
-./pmap.py crash_memmap.txt --pc 0xf79e245c
+./pmap.py crash_test/pmap-sample.txt --pc 0xf79e245c
 ```
 
 Output:
@@ -251,7 +251,7 @@ This tells you: **Crash is in libubus.so at offset 0x245c**
 **Analyze Link Register (Return Address):**
 
 ```bash
-./pmap.py crash_memmap.txt --lr 0xf79e7f10
+./pmap.py crash_test/pmap-sample.txt --lr 0xf79e7f10
 ```
 
 Tells you where to return when the crashing function ends.
@@ -259,7 +259,7 @@ Tells you where to return when the crashing function ends.
 **Check Stack and Frame Pointers:**
 
 ```bash
-./pmap.py crash_memmap.txt --sp 0xff8b0000 --fp 0xff8b0010
+./pmap.py crash_test/pmap-sample.txt --sp 0xff8b0000 --fp 0xff8b0010
 ```
 
 Verifies:
@@ -270,7 +270,7 @@ Verifies:
 **Full Crash Analysis:**
 
 ```bash
-./pmap.py crash_memmap.txt \
+./pmap.py crash_test/pmap-sample.txt \
   --pc 0xf79e245c \
   --lr 0xf79e7f10 \
   --sp 0xff8b0000 \
@@ -557,7 +557,7 @@ Runs the complete end-to-end test flow:
 ### Test 1: Basic Memory Map Analysis
 
 ```bash
-./pmap.py memmap.txt
+./pmap.py test/pmap-sample.txt
 ```
 
 **Expected output:**
@@ -570,7 +570,7 @@ Runs the complete end-to-end test flow:
 ### Test 2: Program Counter Only
 
 ```bash
-./pmap.py memmap.txt --pc 0xf79e245c
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c
 ```
 
 **Expected output:**
@@ -581,7 +581,7 @@ Runs the complete end-to-end test flow:
 ### Test 3: Multiple Registers
 
 ```bash
-./pmap.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8b0000
+./pmap.py test/pmap-sample.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8b0000
 ```
 
 **Expected output:**
@@ -592,7 +592,7 @@ Runs the complete end-to-end test flow:
 ### Test 4: HTML Report
 
 ```bash
-./pmap.py memmap.txt --html report.html
+./pmap.py test/pmap-sample.txt --html report.html
 ```
 
 **Expected output:**
@@ -604,7 +604,7 @@ Runs the complete end-to-end test flow:
 ### Test 5: Segment-Only View
 
 ```bash
-./pmap.py memmap.txt --segments
+./pmap.py test/pmap-sample.txt --segments
 ```
 
 **Expected output:**
@@ -615,7 +615,7 @@ Runs the complete end-to-end test flow:
 ### Test 6: Statistics Only
 
 ```bash
-./pmap.py memmap.txt --stats
+./pmap.py test/pmap-sample.txt --stats
 ```
 
 **Expected output:**
@@ -636,7 +636,7 @@ Runs the complete end-to-end test flow:
 ### Test 8: Error Handling - Invalid Option
 
 ```bash
-./pmap.py memmap.txt --invalid
+./pmap.py test/pmap-sample.txt --invalid
 ```
 
 **Expected output:**
@@ -646,7 +646,7 @@ Runs the complete end-to-end test flow:
 ### Test 9: Security Check
 
 ```bash
-./pmap.py memmap.txt --security
+./pmap.py test/pmap-sample.txt --security
 ```
 
 **Expected output:**

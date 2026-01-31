@@ -15,7 +15,7 @@ def print_help(prog: str):
     print(
         f"""Usage: {prog} <memory_dump_file> [options]
 
-Standalone HTML report generator for Linux process memory maps.
+HTML report generator for Linux process memory maps.
 
 Required Options:
     --html <output.html>   -- Generate HTML visualization file
@@ -30,12 +30,12 @@ Help:
     -h, --help             -- Show this help menu
 
 Examples:
-    {prog} memmap.txt --html report.html
-    {prog} memmap.txt --pc 0xf79e245c --sp 0xff8c1000 --html crash_report.html
+    {prog} test/pmap-sample.txt --html report.html
+    {prog} test/pmap-sample.txt --pc 0xf79e245c --sp 0xff8c1000 --html crash_report.html
 
 For CLI text analysis:
-    pmap.py memmap.txt --table
-    pmap.py memmap.txt --pc 0xaddr
+    pmap.py test/pmap-sample.txt --table
+    pmap.py test/pmap-sample.txt --pc 0xaddr
 """
     )
 

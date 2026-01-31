@@ -320,124 +320,137 @@ class MemoryMapVisualizer:
     @staticmethod
     def print_table(memmap: MemoryMap):
         """Print memory map in tabular format"""
-        print()
-        print("=" * 130)
-        print(f"MEMORY MAP - TABULAR VIEW".center(130))
-        print("=" * 130)
-        print(f"Process: {memmap.process_name:<20} PID: {memmap.pid:<10} "
-              f"Segments: {len(memmap.segments):<5} Total Size: {memmap.total_size:,} bytes")
-        print("=" * 130)
-        print(f"{'Start Addr':<14} {'End Addr':<14} {'Size':<12} {'Perms':<6} "
-              f"{'Type':<10} {'Binary/Mapping':<60}")
-        print("-" * 130)
-        
-        for seg in memmap.segments:
-            name = seg.pathname if seg.pathname else "[anon]"
-            print(f"0x{seg.start:08x}     0x{seg.end:08x}     "
-                  f"{seg.size:>10}  {seg.perms:<6} {seg.seg_type.value:<10} "
-                  f"{name}")
-        
-        print("=" * 130)
-        print()
+        try:
+            print()
+            print("=" * 130)
+            print(f"MEMORY MAP - TABULAR VIEW".center(130))
+            print("=" * 130)
+            print(f"Process: {memmap.process_name:<20} PID: {memmap.pid:<10} "
+                  f"Segments: {len(memmap.segments):<5} Total Size: {memmap.total_size:,} bytes")
+            print("=" * 130)
+            print(f"{'Start Addr':<14} {'End Addr':<14} {'Size':<12} {'Perms':<6} "
+                  f"{'Type':<10} {'Binary/Mapping':<60}")
+            print("-" * 130)
+            
+            for seg in memmap.segments:
+                name = seg.pathname if seg.pathname else "[anon]"
+                print(f"0x{seg.start:08x}     0x{seg.end:08x}     "
+                      f"{seg.size:>10}  {seg.perms:<6} {seg.seg_type.value:<10} "
+                      f"{name}")
+            
+            print("=" * 130)
+            print()
+        except BrokenPipeError:
+            raise
     
     @staticmethod
     def print_ascii_layout(memmap: MemoryMap, crash_ctx: Optional[CrashContext] = None):
         """Print ASCII visualization of memory layout"""
-        print()
-        print("=" * 90)
-        print("MEMORY LAYOUT - ASCII VISUALIZATION".center(90))
-        print("=" * 90)
-        print()
-        print("High Memory")
-        print("     ↑")
-        print("     │")
-        
-        for seg in reversed(memmap.segments):
-            name = seg.pathname if seg.pathname else "[anon]"
-            
-            # Check for crash markers
-            markers = []
-            if crash_ctx:
-                if crash_ctx.pc and seg.start <= crash_ctx.pc < seg.end:
-                    markers.append("PC")
-                if crash_ctx.lr and seg.start <= crash_ctx.lr < seg.end:
-                    markers.append("LR")
-                if crash_ctx.sp and seg.start <= crash_ctx.sp < seg.end:
-                    markers.append("SP")
-                if crash_ctx.fp and seg.start <= crash_ctx.fp < seg.end:
-                    markers.append("FP")
-            
-            marker_str = " ← " + " ".join(markers) if markers else ""
-            
-            print(f"0x{seg.end:08x} ──┬─ {seg.perms:<5} {seg.seg_type.value:<8} "
-                f"{name}{marker_str}")
-            print("             │")
-            print(f"0x{seg.start:08x} ──┴─ (size: {seg.size:,} bytes)")
+        try:
+            print()
+            print("=" * 90)
+            print("MEMORY LAYOUT - ASCII VISUALIZATION".center(90))
+            print("=" * 90)
+            print()
+            print("High Memory")
+            print("     ↑")
             print("     │")
-        
-        print("     ↓")
-        print("Low Memory")
-        print()
+            
+            for seg in reversed(memmap.segments):
+                name = seg.pathname if seg.pathname else "[anon]"
+                
+                # Check for crash markers
+                markers = []
+                if crash_ctx:
+                    if crash_ctx.pc and seg.start <= crash_ctx.pc < seg.end:
+                        markers.append("PC")
+                    if crash_ctx.lr and seg.start <= crash_ctx.lr < seg.end:
+                        markers.append("LR")
+                    if crash_ctx.sp and seg.start <= crash_ctx.sp < seg.end:
+                        markers.append("SP")
+                    if crash_ctx.fp and seg.start <= crash_ctx.fp < seg.end:
+                        markers.append("FP")
+                
+                marker_str = " ← " + " ".join(markers) if markers else ""
+                
+                print(f"0x{seg.end:08x} ──┬─ {seg.perms:<5} {seg.seg_type.value:<8} "
+                    f"{name}{marker_str}")
+                print("             │")
+                print(f"0x{seg.start:08x} ──┴─ (size: {seg.size:,} bytes)")
+                print("     │")
+            
+            print("     ↓")
+            print("Low Memory")
+            print()
+        except BrokenPipeError:
+            raise
     
     @staticmethod
     def print_grouped_by_binary(memmap: MemoryMap):
         """Print memory map grouped by binary"""
-        print()
-        print("=" * 90)
-        print("MEMORY MAP - GROUPED BY BINARY".center(90))
-        print("=" * 90)
-        print()
-        
-        # Group segments by binary
-        binaries: Dict[str, List[MemorySegment]] = {}
-        for seg in memmap.segments:
-            key = seg.pathname if seg.pathname else "[anon]"
-            if key not in binaries:
-                binaries[key] = []
-            binaries[key].append(seg)
-        
-        for binary, segments in binaries.items():
-            total_size = sum(seg.size for seg in segments)
-            print(f"📦 {binary}")
-            print(f"   Total size: {total_size:,} bytes ({len(segments)} segments)")
-            
-            for seg in segments:
-                print(f"   0x{seg.start:08x}-0x{seg.end:08x}  {seg.perms}  "
-                      f"{seg.seg_type.value:<8}  {seg.size:>10} bytes")
+        try:
             print()
+            print("=" * 90)
+            print("MEMORY MAP - GROUPED BY BINARY".center(90))
+            print("=" * 90)
+            print()
+            
+            # Group segments by binary
+            binaries: Dict[str, List[MemorySegment]] = {}
+            for seg in memmap.segments:
+                key = seg.pathname if seg.pathname else "[anon]"
+                if key not in binaries:
+                    binaries[key] = []
+                binaries[key].append(seg)
+            
+            for binary, segments in binaries.items():
+                total_size = sum(seg.size for seg in segments)
+                print(f"📦 {binary}")
+                print(f"   Total size: {total_size:,} bytes ({len(segments)} segments)")
+                
+                for seg in segments:
+                    print(f"   0x{seg.start:08x}-0x{seg.end:08x}  {seg.perms}  "
+                          f"{seg.seg_type.value:<8}  {seg.size:>10} bytes")
+                print()
+        except BrokenPipeError:
+            # Handle pipe closing gracefully (e.g., when piped to head)
+            raise
     
     @staticmethod
     def print_statistics(memmap: MemoryMap):
         """Print memory map statistics"""
-        print()
-        print("=" * 90)
-        print("MEMORY MAP STATISTICS".center(90))
-        print("=" * 90)
-        print()
-        
-        # Calculate statistics by segment type
-        type_stats: Dict[str, Dict[str, int]] = {}
-        for seg in memmap.segments:
-            seg_type = seg.seg_type.value
-            if seg_type not in type_stats:
-                type_stats[seg_type] = {'count': 0, 'size': 0}
-            type_stats[seg_type]['count'] += 1
-            type_stats[seg_type]['size'] += seg.size
-        
-        print(f"Total Segments: {len(memmap.segments)}")
-        print(f"Total Memory:   {memmap.total_size:,} bytes ({memmap.total_size / (1024*1024):.2f} MB)")
-        print()
-        print(f"{'Segment Type':<15} {'Count':<10} {'Total Size':<20} {'Percentage':<10}")
-        print("-" * 90)
-        
-        for seg_type in sorted(type_stats.keys()):
-            stats = type_stats[seg_type]
-            percentage = (stats['size'] / memmap.total_size) * 100
-            size_mb = stats['size'] / (1024 * 1024)
-            print(f"{seg_type:<15} {stats['count']:<10} "
-                  f"{stats['size']:>12,} bytes ({size_mb:>6.2f} MB)  {percentage:>6.2f}%")
-        
-        print()
+        try:
+            print()
+            print("=" * 90)
+            print("MEMORY MAP STATISTICS".center(90))
+            print("=" * 90)
+            print()
+            
+            # Calculate statistics by segment type
+            type_stats: Dict[str, Dict[str, int]] = {}
+            for seg in memmap.segments:
+                seg_type = seg.seg_type.value
+                if seg_type not in type_stats:
+                    type_stats[seg_type] = {'count': 0, 'size': 0}
+                type_stats[seg_type]['count'] += 1
+                type_stats[seg_type]['size'] += seg.size
+            
+            print(f"Total Segments: {len(memmap.segments)}")
+            print(f"Total Memory:   {memmap.total_size:,} bytes ({memmap.total_size / (1024*1024):.2f} MB)")
+            print()
+            print(f"{'Segment Type':<15} {'Count':<10} {'Total Size':<20} {'Percentage':<10}")
+            print("-" * 90)
+            
+            for seg_type in sorted(type_stats.keys()):
+                stats = type_stats[seg_type]
+                percentage = (stats['size'] / memmap.total_size) * 100
+                size_mb = stats['size'] / (1024 * 1024)
+                print(f"{seg_type:<15} {stats['count']:<10} "
+                      f"{stats['size']:>12,} bytes ({size_mb:>6.2f} MB)  {percentage:>6.2f}%")
+            
+            print()
+        except BrokenPipeError:
+            raise
 
 
 # ============================================================================

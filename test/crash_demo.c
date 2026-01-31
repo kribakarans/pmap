@@ -15,23 +15,23 @@ void print_registers(ucontext_t *context, FILE *fp) {
 #ifdef __x86_64__
     /* x86-64 registers using gregs array indices */
     fprintf(fp, "=== CPU REGISTERS (x86-64) ===\n");
-    fprintf(fp, "rip: %016lx (Program Counter - where crash occurred)\n", mctx->gregs[16]);  /* REG_RIP */
-    fprintf(fp, "rsp: %016lx (Stack Pointer)\n", mctx->gregs[15]);  /* REG_RSP */
-    fprintf(fp, "rbp: %016lx (Frame Pointer)\n", mctx->gregs[10]);  /* REG_RBP */
-    fprintf(fp, "rax: %016lx\n", mctx->gregs[13]);  /* REG_RAX */
-    fprintf(fp, "rbx: %016lx\n", mctx->gregs[11]);  /* REG_RBX */
-    fprintf(fp, "rcx: %016lx\n", mctx->gregs[14]);  /* REG_RCX */
-    fprintf(fp, "rdx: %016lx\n", mctx->gregs[12]);  /* REG_RDX */
-    fprintf(fp, "rsi: %016lx\n", mctx->gregs[9]);   /* REG_RSI */
-    fprintf(fp, "rdi: %016lx\n", mctx->gregs[8]);   /* REG_RDI */
-    fprintf(fp, "r8:  %016lx\n", mctx->gregs[0]);   /* REG_R8 */
-    fprintf(fp, "r9:  %016lx\n", mctx->gregs[1]);   /* REG_R9 */
-    fprintf(fp, "r10: %016lx\n", mctx->gregs[2]);   /* REG_R10 */
-    fprintf(fp, "r11: %016lx\n", mctx->gregs[3]);   /* REG_R11 */
-    fprintf(fp, "r12: %016lx\n", mctx->gregs[4]);   /* REG_R12 */
-    fprintf(fp, "r13: %016lx\n", mctx->gregs[5]);   /* REG_R13 */
-    fprintf(fp, "r14: %016lx\n", mctx->gregs[6]);   /* REG_R14 */
-    fprintf(fp, "r15: %016lx\n", mctx->gregs[7]);   /* REG_R15 */
+    fprintf(fp, "rip: %016llx (Program Counter - where crash occurred)\n", (unsigned long long)mctx->gregs[16]);  /* REG_RIP */
+    fprintf(fp, "rsp: %016llx (Stack Pointer)\n", (unsigned long long)mctx->gregs[15]);  /* REG_RSP */
+    fprintf(fp, "rbp: %016llx (Frame Pointer)\n", (unsigned long long)mctx->gregs[10]);  /* REG_RBP */
+    fprintf(fp, "rax: %016llx\n", (unsigned long long)mctx->gregs[13]);  /* REG_RAX */
+    fprintf(fp, "rbx: %016llx\n", (unsigned long long)mctx->gregs[11]);  /* REG_RBX */
+    fprintf(fp, "rcx: %016llx\n", (unsigned long long)mctx->gregs[14]);  /* REG_RCX */
+    fprintf(fp, "rdx: %016llx\n", (unsigned long long)mctx->gregs[12]);  /* REG_RDX */
+    fprintf(fp, "rsi: %016llx\n", (unsigned long long)mctx->gregs[9]);   /* REG_RSI */
+    fprintf(fp, "rdi: %016llx\n", (unsigned long long)mctx->gregs[8]);   /* REG_RDI */
+    fprintf(fp, "r8:  %016llx\n", (unsigned long long)mctx->gregs[0]);   /* REG_R8 */
+    fprintf(fp, "r9:  %016llx\n", (unsigned long long)mctx->gregs[1]);   /* REG_R9 */
+    fprintf(fp, "r10: %016llx\n", (unsigned long long)mctx->gregs[2]);   /* REG_R10 */
+    fprintf(fp, "r11: %016llx\n", (unsigned long long)mctx->gregs[3]);   /* REG_R11 */
+    fprintf(fp, "r12: %016llx\n", (unsigned long long)mctx->gregs[4]);   /* REG_R12 */
+    fprintf(fp, "r13: %016llx\n", (unsigned long long)mctx->gregs[5]);   /* REG_R13 */
+    fprintf(fp, "r14: %016llx\n", (unsigned long long)mctx->gregs[6]);   /* REG_R14 */
+    fprintf(fp, "r15: %016llx\n", (unsigned long long)mctx->gregs[7]);   /* REG_R15 */
     
 #elif defined(__aarch64__)
     /* ARM64 registers */

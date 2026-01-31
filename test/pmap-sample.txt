@@ -1,4 +1,3 @@
-# cat /proc/12044/maps
 0098b000-0098c000 r-xp 00000000 b3:04 6081                               /usr/bin/amxrt
 0098c000-0098d000 r--p 00000000 b3:04 6081                               /usr/bin/amxrt
 0098d000-0098e000 rw-p 00001000 b3:04 6081                               /usr/bin/amxrt

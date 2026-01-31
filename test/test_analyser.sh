@@ -26,7 +26,7 @@ run_section "Test 1: Basic analysis (all views)" \
     "run_pmap \"$SAMPLE_DUMP\" | head -50; echo '... (truncated)'"
 
 run_section "Test 2: Segment overview only" \
-    "run_pmap \"$SAMPLE_DUMP\" --segments | head -30"
+    "run_pmap \"$SAMPLE_DUMP\" --grouped | head -30"
 
 run_section "Test 3: ASCII layout only" \
     "run_pmap \"$SAMPLE_DUMP\" --ascii | head -40"
