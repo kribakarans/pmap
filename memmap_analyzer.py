@@ -441,8 +441,10 @@ class CrashAnalyzer:
             print(f"  Offset in segment: 0x{offset:x}")
             
             # Generate addr2line command
+            # For addr2line, we need: (Address - Segment_Base) + File_Offset
             if seg.pathname and not seg.pathname.startswith('['):
-                print(f"  Debug command: addr2line -e {seg.pathname} 0x{offset:x}")
+                addr2line_offset = offset + seg.offset
+                print(f"  Debug command: addr2line -e {seg.pathname} 0x{addr2line_offset:x}")
             
             # Check for warnings
             if check_stack and seg.seg_type != SegmentType.STACK:
