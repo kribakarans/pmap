@@ -123,7 +123,7 @@ class CrashLocation:
         if not self.segment.pathname or self.segment.pathname.startswith('['):
             return f"# addr2line not applicable for {self.segment.pathname or 'anonymous mapping'}"
         
-        return f"addr2line -e {self.segment.pathname} 0x{self.offset_in_segment:x}"
+        return f"addr2line -f -C -i -e {self.segment.pathname} 0x{self.offset_in_segment:x}"
 
 
 class MemoryMapParser:
@@ -925,7 +925,7 @@ class HTMLGenerator:
                 addr2line = ""
                 if seg.pathname and not seg.pathname.startswith('['):
                     addr2line_offset = offset + seg.offset
-                    addr2line = f"<br>Debug: <code>addr2line -e {binary} 0x{addr2line_offset:x}</code>"
+                    addr2line = f"<br>Debug: <code>addr2line -f -C -i -e {binary} 0x{addr2line_offset:x}</code>"
                 
                 return f"""
                     <div class="crash-detail">
@@ -1045,7 +1045,7 @@ class CrashAnalyzer:
             # For addr2line, we need: (Address - Segment_Base) + File_Offset
             if seg.pathname and not seg.pathname.startswith('['):
                 addr2line_offset = offset + seg.offset
-                print(f"  Debug command: addr2line -e {seg.pathname} 0x{addr2line_offset:x}")
+                print(f"  Debug command: addr2line -f -C -i -e {seg.pathname} 0x{addr2line_offset:x}")
             
             # Check for warnings
             if check_stack and seg.seg_type != SegmentType.STACK:
