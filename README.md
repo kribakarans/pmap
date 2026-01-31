@@ -6,18 +6,19 @@ A comprehensive Python tool for parsing and visualizing Linux process memory dum
 
 - **Memory Map Parsing**: Parse `/proc/<pid>/maps` format dumps
 - **Segment Classification**: Automatically classify segments (CODE, DATA, HEAP, STACK, etc.)
-- **Visual Representation**: 
+- **Visual Representation**:
   - Tabular view with full pathnames (no truncation)
   - ASCII memory layout diagram
   - Grouped by binary view
   - Statistics and distribution
-- **Crash Context Analysis**: 
-  - Resolve PC (Program Counter) and LR (Link Register) to binaries
+  - Segment overview box layout
+- **Crash Context Analysis**:
+  - Resolve PC (Program Counter), LR (Link Register), SP, FP to binaries
   - Generate `addr2line` commands for debugging
   - Identify suspicious memory regions
   - Stack pointer validation
 - **Security Analysis**: Detect writable+executable regions
-- **Multiple Output Formats**: Text table, ASCII art, JSON
+- **HTML Report**: Compact, color-coded, crash markers, grouped view
 - **Pure Python**: No compilation needed, works on any system with Python 3.7+
 
 ## Installation
@@ -31,17 +32,20 @@ chmod +x memmap_analyzer.py
 ## Usage
 
 ```bash
-# Basic analysis (includes all views)
+# Basic analysis (includes all reports)
 python3 memmap_analyzer.py memmap.txt
 
-# With crash context
+# Crash context analysis
 python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10
 
 # With all registers
-python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8c0000
+python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8c0000 --fp 0xff8c0010
 
-# JSON output
-python3 memmap_analyzer.py memmap.txt --json > output.json
+# HTML report (default filename: <mapfile>.html)
+python3 memmap_analyzer.py memmap.txt --html
+
+# HTML report with custom filename
+python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --html crash_report.html
 ```
 
 ### Command-Line Options
@@ -49,12 +53,21 @@ python3 memmap_analyzer.py memmap.txt --json > output.json
 ```
 python3 memmap_analyzer.py <memory_dump_file> [OPTIONS]
 
-Options:
-  --json              Output in JSON format
-  --pc <addr>         Program counter address (hex)
-  --lr <addr>         Link register address (hex)
-  --sp <addr>         Stack pointer address (hex)
-  --fp <addr>         Frame pointer address (hex)
+Output Options (each shows only its specific report):
+  --report             Show all reports (default if no options given)
+  --table              Show memory map table view only
+  --stats              Show memory statistics only
+  --grouped            Show memory map grouped by binary only
+  --segments           Show segment overview visualization only
+  --ascii              Show ASCII memory layout only
+  --security           Show security analysis only
+  --html [file]        Generate HTML visualization (defaults to <mapfile>.html)
+
+Crash Analysis Options (shows crash context analysis only):
+  --pc <addr>          Program counter address (hex)
+  --lr <addr>          Link register address (hex)
+  --sp <addr>          Stack pointer address (hex)
+  --fp <addr>          Frame pointer address (hex)
 ```
 
 ## Output Examples
@@ -221,10 +234,11 @@ See [memmap.txt](memmap.txt) for example input data from an ARM-based Linux syst
 python3 memmap_analyzer.py /tmp/crash_maps.txt --pc 0xXXXXXXXX --lr 0xXXXXXXXX
 ```
 
-### Export to JSON for custom processing
+### Generate HTML report
 
 ```bash
-python3 memmap_analyzer.py memmap.txt --json | jq '.segments[] | select(.type=="CODE")'
+python3 memmap_analyzer.py memmap.txt --html
+python3 memmap_analyzer.py memmap.txt --pc 0x1234 --sp 0x5678 --html crash_report.html
 ```
 
 ### Security audit
@@ -248,11 +262,29 @@ The tool automatically checks for security issues like writable+executable regio
 python3 memmap_analyzer.py memmap.txt
 
 # Crash analysis with registers
-python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8b0000
+python3 memmap_analyzer.py memmap.txt --pc 0xf79e245c --lr 0xf79e7f10 --sp 0xff8b0000 --fp 0xff8b0010
 
-# JSON export
-python3 memmap_analyzer.py memmap.txt --json > map.json
+# HTML report (default filename: memmap.txt.html)
+python3 memmap_analyzer.py memmap.txt --html
 ```
+
+## Helper Scripts
+
+- **Build + crash + HTML verification**: [test/test_html.sh](test/test_html.sh)
+  - Compiles crash demo, runs it, generates HTML with crash context, and validates output.
+- **Full test suite**: [run_all_tests.sh](run_all_tests.sh)
+  - Runs SIGSEGV/SIGFPE/SIGABRT tests and validates analysis output.
+- **Batch HTML generation**: [generate_html_reports.sh](generate_html_reports.sh)
+  - Generates HTML reports from available crash dumps.
+
+## Demo Crash Program
+
+- **Source**: [test/crash_demo.c](test/crash_demo.c)
+- **Binary**: test/crash_demo.out (built via Makefile)
+- **Build**:
+  ```bash
+  make
+  ```
 
 ### Understanding addr2line Output
 
