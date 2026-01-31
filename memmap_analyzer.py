@@ -531,11 +531,20 @@ class HTMLGenerator:
         
         .memory-scale {{
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             margin-bottom: 5px;
             font-family: monospace;
             font-size: 0.85em;
             color: #666;
+            gap: 0px;
+        }}
+        
+        .memory-scale-top {{
+            margin-bottom: 3px;
+        }}
+        
+        .memory-scale-bottom {{
+            margin-top: 3px;
         }}
         
         .memory-container {{
@@ -617,23 +626,30 @@ class HTMLGenerator:
         
         .legend {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 6px;
             margin-top: 8px;
         }}
         
         .legend-item {{
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 5px;
             font-size: 0.8em;
+            line-height: 1.3;
         }}
         
         .legend-color {{
+            flex-shrink: 0;
             width: 18px;
             height: 12px;
             border-radius: 2px;
             border: 1px solid rgba(0,0,0,0.2);
+            margin-top: 2px;
+        }}
+        
+        .legend-text {{
+            flex: 1;
         }}
         
         .stats-grid {{
@@ -746,11 +762,13 @@ class HTMLGenerator:
                 <h2 class="section-title">📊 Memory Layout Visualization</h2>
                 <div class="memory-viz">
                     <div class="memory-scale">
-                        <span>Low Memory: 0x{min_addr:016x}</span>
-                        <span>High Memory: 0x{max_addr:016x}</span>
+                        <span class="memory-scale-top">⬇️ High Memory: 0x{max_addr:016x}</span>
                     </div>
                     <div class="memory-container">
                         {segments_html}
+                    </div>
+                    <div class="memory-scale">
+                        <span class="memory-scale-bottom">⬆️ Low Memory: 0x{min_addr:016x}</span>
                     </div>
                     <div class="legend">
                         {HTMLGenerator._generate_legend_html()}
@@ -856,13 +874,27 @@ class HTMLGenerator:
     
     @staticmethod
     def _generate_legend_html() -> str:
-        """Generate legend HTML"""
+        """Generate legend HTML with segment type descriptions"""
+        # Descriptions for each segment type
+        descriptions = {
+            SegmentType.CODE: "Executable code (.text section)",
+            SegmentType.DATA: "Initialized data (.data section)",
+            SegmentType.RODATA: "Read-only data (.rodata section)",
+            SegmentType.BSS: "Uninitialized data (.bss section)",
+            SegmentType.HEAP: "Dynamic memory allocation area",
+            SegmentType.STACK: "Thread stack (local variables)",
+            SegmentType.ANON: "Anonymous memory mapping",
+            SegmentType.VDSO: "Virtual dynamic shared object",
+            SegmentType.UNKNOWN: "Unknown or special segment",
+        }
+        
         legend_items = []
         for seg_type, color in HTMLGenerator.SEGMENT_COLORS.items():
+            desc = descriptions.get(seg_type, "")
             legend_items.append(f"""
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: {color};"></div>
-                    <span>{seg_type.value}</span>
+                    <div class="legend-text"><strong>{seg_type.value}</strong>: {desc}</div>
                 </div>""")
         return "\n".join(legend_items)
     
