@@ -6,9 +6,11 @@ Enhanced visualization and crash context analysis
 
 import re
 import sys
+import os
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict
 from enum import Enum
+from datetime import datetime
 
 
 class SegmentType(Enum):
@@ -398,6 +400,605 @@ class MemoryMapVisualizer:
         print()
 
 
+class HTMLGenerator:
+    """Generate HTML visualization of memory maps"""
+    
+    SEGMENT_COLORS = {
+        SegmentType.CODE: "#4CAF50",
+        SegmentType.DATA: "#2196F3",
+        SegmentType.RODATA: "#9C27B0",
+        SegmentType.BSS: "#FF9800",
+        SegmentType.HEAP: "#F44336",
+        SegmentType.STACK: "#00BCD4",
+        SegmentType.ANON: "#9E9E9E",
+        SegmentType.VDSO: "#795548",
+        SegmentType.UNKNOWN: "#607D8B",
+    }
+    
+    @staticmethod
+    def generate_html(memmap: MemoryMap, crash_ctx: Optional[CrashContext], output_file: str):
+        """Generate comprehensive HTML visualization"""
+        
+        # Calculate memory range for visualization
+        if not memmap.segments:
+            print("Error: No memory segments to visualize")
+            return
+        
+        min_addr = min(seg.start for seg in memmap.segments)
+        max_addr = max(seg.end for seg in memmap.segments)
+        total_range = max_addr - min_addr
+        
+        html_content = HTMLGenerator._generate_html_content(
+            memmap, crash_ctx, min_addr, max_addr, total_range
+        )
+        
+        with open(output_file, 'w') as f:
+            f.write(html_content)
+        
+        print(f"\n✓ HTML visualization saved to: {output_file}")
+        print(f"  Open in browser: file://{os.path.abspath(output_file)}\n")
+    
+    @staticmethod
+    def _generate_html_content(memmap: MemoryMap, crash_ctx: Optional[CrashContext], 
+                               min_addr: int, max_addr: int, total_range: int) -> str:
+        """Generate complete HTML content"""
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Generate segment HTML
+        segments_html = HTMLGenerator._generate_segments_html(
+            memmap, crash_ctx, min_addr, total_range
+        )
+        
+        # Generate statistics
+        stats_html = HTMLGenerator._generate_statistics_html(memmap)
+        
+        # Generate crash analysis
+        crash_html = HTMLGenerator._generate_crash_html(memmap, crash_ctx)
+        
+        # Generate segment details table
+        table_html = HTMLGenerator._generate_table_html(memmap)
+        
+        return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Map Analysis - {memmap.process_name or 'Process'}</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px;
+            color: #333;
+            font-size: 15px;
+        }}
+        
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }}
+        
+        .header {{
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }}
+        
+        .header h1 {{
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }}
+        
+        .header .info {{
+            font-size: 0.9em;
+            opacity: 0.9;
+        }}
+        
+        .content {{
+            padding: 15px;
+        }}
+        
+        .section {{
+            margin-bottom: 20px;
+        }}
+        
+        .section-title {{
+            font-size: 1.4em;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }}
+        
+        .memory-viz {{
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+        }}
+        
+        .memory-scale {{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #666;
+        }}
+        
+        .memory-container {{
+            background: white;
+            border: 2px solid #2c3e50;
+            border-radius: 3px;
+            overflow-y: auto;
+            overflow-x: auto;
+            max-height: 600px;
+            font-family: monospace;
+        }}
+        
+        .segment-group {{
+            border-bottom: 2px solid #2c3e50;
+        }}
+        
+        .segment-group:last-child {{
+            border-bottom: none;
+        }}
+        
+        .segment-group-header {{
+            background: #34495e;
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 0.95em;
+            border-bottom: 2px solid #2c3e50;
+        }}
+        
+        .segment {{
+            padding: 3px 12px;
+            font-size: 0.85em;
+            border-bottom: 1px solid #ecf0f1;
+            line-height: 1.5;
+            white-space: nowrap;
+            min-width: max-content;
+        }}
+        
+        .segment:last-child {{
+            border-bottom: none;
+        }}
+        
+        .segment-addr {{
+            display: inline-block;
+            width: 230px;
+            color: #1f2a33;
+        }}
+        
+        .segment-perms {{
+            display: inline-block;
+            width: 45px;
+            font-weight: bold;
+            color: #1f2a33;
+        }}
+        
+        .segment-type {{
+            display: inline-block;
+            width: 65px;
+            font-weight: 600;
+            color: #1f2a33;
+        }}
+        
+        .segment-path {{
+            display: inline-block;
+            color: #2b2b2b;
+        }}
+        
+        .crash-marker {{
+            display: inline-block;
+            padding: 2px 6px;
+            background: #ff0000;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-left: 6px;
+            box-shadow: 0 1px 3px rgba(255,0,0,0.5);
+        }}
+        
+        .legend {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
+        }}
+        
+        .legend-item {{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8em;
+        }}
+        
+        .legend-color {{
+            width: 18px;
+            height: 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(0,0,0,0.2);
+        }}
+        
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px;
+        }}
+        
+        .stat-card {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }}
+        
+        .stat-card h3 {{
+            font-size: 0.7em;
+            opacity: 0.9;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }}
+        
+        .stat-card .value {{
+            font-size: 1.4em;
+            font-weight: bold;
+        }}
+        
+        .crash-info {{
+            background: #fff3cd;
+            border-left: 3px solid #ff9800;
+            padding: 8px 10px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }}
+        
+        .crash-info h3 {{
+            color: #ff6f00;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }}
+        
+        .crash-detail {{
+            font-family: monospace;
+            background: white;
+            padding: 6px 8px;
+            border-radius: 2px;
+            margin: 3px 0;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }}
+        
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.75em;
+        }}
+        
+        table th {{
+            background: #2c3e50;
+            color: white;
+            padding: 6px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-size: 0.9em;
+        }}
+        
+        table td {{
+            padding: 4px 8px;
+            border-bottom: 1px solid #eee;
+        }}
+        
+        table tbody tr:hover {{
+            background: #f8f9fa;
+        }}
+        
+        .monospace {{
+            font-family: monospace;
+        }}
+        
+        .footer {{
+            background: #f8f9fa;
+            padding: 8px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+            font-size: 0.75em;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Memory Map Analysis</h1>
+            <div class="info">
+                Process: <strong>{memmap.process_name or 'Unknown'}</strong> | 
+                PID: <strong>{memmap.pid or 'N/A'}</strong> | 
+                Generated: <strong>{timestamp}</strong>
+            </div>
+        </div>
+        
+        <div class="content">
+            {stats_html}
+            
+            {crash_html}
+            
+            <div class="section">
+                <h2 class="section-title">📊 Memory Layout Visualization</h2>
+                <div class="memory-viz">
+                    <div class="memory-scale">
+                        <span>Low Memory: 0x{min_addr:016x}</span>
+                        <span>High Memory: 0x{max_addr:016x}</span>
+                    </div>
+                    <div class="memory-container">
+                        {segments_html}
+                    </div>
+                    <div class="legend">
+                        {HTMLGenerator._generate_legend_html()}
+                    </div>
+                </div>
+            </div>
+            
+            {table_html}
+        </div>
+        
+        <div class="footer">
+            Generated by Linux Crash Analysis Tool | Memory Map Analyzer v1.0
+        </div>
+    </div>
+</body>
+</html>"""
+    
+    @staticmethod
+    def _generate_segments_html(memmap: MemoryMap, crash_ctx: Optional[CrashContext], 
+                                min_addr: int, total_range: int) -> str:
+        """Generate HTML for memory segments in grouped box style"""
+        
+        # Track which addresses have crash markers
+        crash_addrs = {}
+        if crash_ctx:
+            if crash_ctx.pc is not None:
+                crash_addrs[crash_ctx.pc] = "PC"
+            if crash_ctx.lr is not None:
+                crash_addrs[crash_ctx.lr] = "LR"
+            if crash_ctx.sp is not None:
+                crash_addrs[crash_ctx.sp] = "SP"
+            if crash_ctx.fp is not None:
+                crash_addrs[crash_ctx.fp] = "FP"
+        
+        # Helper function to determine if a segment is a shared library
+        main_path = None
+        for seg in memmap.segments:
+            if seg.pathname and seg.pathname.startswith('/'):
+                if seg.pathname.endswith('/' + memmap.process_name) or seg.pathname.split('/')[-1] == memmap.process_name:
+                    main_path = seg.pathname
+                    break
+        
+        def is_shared_lib(seg: MemorySegment) -> bool:
+            if not seg.pathname or seg.pathname.startswith('['):
+                return False
+            if main_path and seg.pathname == main_path:
+                return False
+            return ('.so' in seg.pathname) or ('/lib/' in seg.pathname) or ('/usr/lib/' in seg.pathname)
+        
+        def format_segment(seg: MemorySegment) -> str:
+            color = HTMLGenerator.SEGMENT_COLORS.get(seg.seg_type, "#607D8B")
+            name = seg.pathname if seg.pathname else "[anon]"
+            
+            # Check if any crash markers are in this segment
+            markers_html = ""
+            for addr, label in crash_addrs.items():
+                if seg.start <= addr < seg.end:
+                    markers_html += f' <span class="crash-marker" title="0x{addr:016x}">{label}</span>'
+            
+            type_colored = f'<span>{seg.seg_type.value}</span>'
+            
+            # Apply brighter translucent background color based on segment type
+            return f'''<div class="segment" style="background-color: {color}33; border-left: 3px solid {color};">
+                <span class="segment-addr">0x{seg.start:08x}-0x{seg.end:08x}</span>
+                <span class="segment-perms">{seg.perms}</span>
+                <span class="segment-type">{type_colored}</span>
+                <span class="segment-path">{name}</span>{markers_html}
+            </div>'''
+        
+        # Group segments
+        groups = [
+            ("Stack", [seg for seg in memmap.segments if seg.seg_type == SegmentType.STACK]),
+            ("Shared Libraries", [seg for seg in memmap.segments if is_shared_lib(seg)]),
+            ("Heap", [seg for seg in memmap.segments if seg.seg_type == SegmentType.HEAP]),
+            (
+                "BSS / Data",
+                [
+                    seg for seg in memmap.segments
+                    if (seg.seg_type in {SegmentType.DATA, SegmentType.ANON, SegmentType.BSS, SegmentType.RODATA})
+                    and seg.seg_type != SegmentType.HEAP
+                    and not is_shared_lib(seg)
+                ],
+            ),
+            (
+                "Code (.text)",
+                [seg for seg in memmap.segments if seg.seg_type == SegmentType.CODE and not is_shared_lib(seg)],
+            ),
+        ]
+        
+        html_parts = []
+        for title, segments in groups:
+            if not segments:
+                continue
+            
+            group_html = f'<div class="segment-group">'
+            group_html += f'<div class="segment-group-header">{title}</div>'
+            for seg in segments:
+                group_html += format_segment(seg)
+            group_html += '</div>'
+            html_parts.append(group_html)
+        
+        return "\n".join(html_parts)
+    
+    @staticmethod
+    def _generate_legend_html() -> str:
+        """Generate legend HTML"""
+        legend_items = []
+        for seg_type, color in HTMLGenerator.SEGMENT_COLORS.items():
+            legend_items.append(f"""
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: {color};"></div>
+                    <span>{seg_type.value}</span>
+                </div>""")
+        return "\n".join(legend_items)
+    
+    @staticmethod
+    def _generate_statistics_html(memmap: MemoryMap) -> str:
+        """Generate statistics HTML"""
+        # Count by type
+        type_stats = {}
+        for seg in memmap.segments:
+            seg_type = seg.seg_type.value
+            if seg_type not in type_stats:
+                type_stats[seg_type] = {'count': 0, 'size': 0}
+            type_stats[seg_type]['count'] += 1
+            type_stats[seg_type]['size'] += seg.size
+        
+        stats_cards = []
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>Total Segments</h3>
+                <div class="value">{len(memmap.segments)}</div>
+            </div>""")
+        
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>Total Memory</h3>
+                <div class="value">{memmap.total_size / (1024*1024):.1f} MB</div>
+            </div>""")
+        
+        for seg_type in [SegmentType.CODE, SegmentType.DATA, SegmentType.HEAP, SegmentType.STACK]:
+            if seg_type.value in type_stats:
+                stats = type_stats[seg_type.value]
+                stats_cards.append(f"""
+                    <div class="stat-card">
+                        <h3>{seg_type.value}</h3>
+                        <div class="value">{stats['size'] / 1024:.0f} KB</div>
+                    </div>""")
+        
+        return f"""
+            <div class="section">
+                <h2 class="section-title">📈 Statistics</h2>
+                <div class="stats-grid">
+                    {" ".join(stats_cards)}
+                </div>
+            </div>"""
+    
+    @staticmethod
+    def _generate_crash_html(memmap: MemoryMap, crash_ctx: Optional[CrashContext]) -> str:
+        """Generate crash analysis HTML"""
+        if not crash_ctx or (crash_ctx.pc is None and crash_ctx.lr is None and 
+                            crash_ctx.sp is None and crash_ctx.fp is None):
+            return ""
+        
+        crash_details = []
+        
+        def analyze_addr(name: str, addr: int):
+            seg = memmap.find_segment(addr)
+            if seg:
+                offset = addr - seg.start
+                binary = seg.pathname if seg.pathname else "[anon]"
+                addr2line = ""
+                if seg.pathname and not seg.pathname.startswith('['):
+                    addr2line_offset = offset + seg.offset
+                    addr2line = f"<br>Debug: <code>addr2line -e {binary} 0x{addr2line_offset:x}</code>"
+                
+                return f"""
+                    <div class="crash-detail">
+                        <strong>{name}:</strong> 0x{addr:016x}<br>
+                        Segment: {binary} [{seg.seg_type.value}]<br>
+                        Permissions: {seg.perms} | Offset: 0x{offset:x}
+                        {addr2line}
+                    </div>"""
+            else:
+                return f"""
+                    <div class="crash-detail">
+                        <strong>{name}:</strong> 0x{addr:016x}<br>
+                        <span style="color: red;">⚠️ Address not found in any mapped segment!</span>
+                    </div>"""
+        
+        if crash_ctx.pc is not None:
+            crash_details.append(analyze_addr("Program Counter (PC)", crash_ctx.pc))
+        if crash_ctx.lr is not None:
+            crash_details.append(analyze_addr("Link Register (LR)", crash_ctx.lr))
+        if crash_ctx.sp is not None:
+            crash_details.append(analyze_addr("Stack Pointer (SP)", crash_ctx.sp))
+        if crash_ctx.fp is not None:
+            crash_details.append(analyze_addr("Frame Pointer (FP)", crash_ctx.fp))
+        
+        return f"""
+            <div class="section">
+                <h2 class="section-title">🔍 Crash Context Analysis</h2>
+                <div class="crash-info">
+                    <h3>Register Analysis</h3>
+                    {"".join(crash_details)}
+                </div>
+            </div>"""
+    
+    @staticmethod
+    def _generate_table_html(memmap: MemoryMap) -> str:
+        """Generate detailed segment table"""
+        rows = []
+        for seg in memmap.segments:
+            name = seg.pathname if seg.pathname else "[anon]"
+            color = HTMLGenerator.SEGMENT_COLORS.get(seg.seg_type, "#607D8B")
+            rows.append(f"""
+                <tr>
+                    <td class="monospace">0x{seg.start:016x}</td>
+                    <td class="monospace">0x{seg.end:016x}</td>
+                    <td>{seg.size:,}</td>
+                    <td class="monospace">{seg.perms}</td>
+                    <td><span style="color: {color}; font-weight: bold;">●</span> {seg.seg_type.value}</td>
+                    <td style="font-size: 0.85em;">{name}</td>
+                </tr>""")
+        
+        return f"""
+            <div class="section">
+                <h2 class="section-title">📋 Detailed Segment Table</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Start Address</th>
+                                <th>End Address</th>
+                                <th>Size (bytes)</th>
+                                <th>Permissions</th>
+                                <th>Type</th>
+                                <th>Binary/Mapping</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {"".join(rows)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>"""
+
+
 class CrashAnalyzer:
     """Crash context analysis"""
     
@@ -516,6 +1117,8 @@ Output Options (each shows only its specific report):
     --segments           -- Show segment overview visualization only
     --ascii              -- Show ASCII memory layout only
     --security           -- Show security analysis only
+    --html <file>        -- Generate HTML visualization to specified file
+                         -- If no filename given, defaults to report.html
 
 Crash Analysis Options (shows crash context analysis only):
     --pc <addr>          -- Program counter address (hex)
@@ -527,13 +1130,16 @@ Help:
     -h, --help           -- Show this help menu
 
 Examples:
-    {prog} memmap.txt                    # Show all reports
-    {prog} memmap.txt --report           # Show all reports (explicit)
-    {prog} memmap.txt --table            # Show only table view
-    {prog} memmap.txt --ascii            # Show only ASCII map
-    {prog} memmap.txt --segments         # Show only segment overview
-    {prog} memmap.txt --pc 0xf79e245c    # Show only crash analysis for PC
-    {prog} memmap.txt --stats --security # Show stats and security reports
+    {prog} memmap.txt                         # Show all reports
+    {prog} memmap.txt --report                # Show all reports (explicit)
+    {prog} memmap.txt --table                 # Show only table view
+    {prog} memmap.txt --ascii                 # Show only ASCII map
+    {prog} memmap.txt --segments              # Show only segment overview
+    {prog} memmap.txt --html output.html      # Generate HTML visualization
+    {prog} memmap.txt --html                  # Generate HTML to report.html (default)
+    {prog} memmap.txt --pc 0xf79e245c         # Show only crash analysis for PC
+    {prog} memmap.txt --pc 0x1234 --html crash.html  # HTML with crash markers
+    {prog} memmap.txt --stats --security      # Show stats and security reports
 """
     )
 
@@ -556,7 +1162,7 @@ def main():
     # Validate command line options
     valid_flags = {
         '--report', '--table', '--stats', '--grouped', '--segments', '--ascii', '--security',
-        '--pc', '--lr', '--sp', '--fp'
+        '--pc', '--lr', '--sp', '--fp', '--html'
     }
     
     # Check for invalid options
@@ -572,8 +1178,8 @@ def main():
                 print(f"Run '{sys.argv[0]} --help' for usage information.", file=sys.stderr)
                 sys.exit(1)
             
-            # Skip next arg if it's an address value for crash options
-            if arg in {'--pc', '--lr', '--sp', '--fp'} and i + 1 < len(sys.argv):
+            # Skip next arg if it's an address value for crash options or filename for html
+            if arg in {'--pc', '--lr', '--sp', '--fp', '--html'} and i + 1 < len(sys.argv):
                 skip_next = True
     
     # Parse command line options
@@ -585,6 +1191,7 @@ def main():
     show_ascii = '--ascii' in sys.argv
     show_security = '--security' in sys.argv
     
+    html_output = None
     crash_ctx = CrashContext()
     has_crash_opts = False
     
@@ -601,9 +1208,20 @@ def main():
         elif arg == '--fp' and i + 1 < len(sys.argv):
             crash_ctx.fp = int(sys.argv[i + 1], 16)
             has_crash_opts = True
+        elif arg == '--html':
+            # Check if next argument exists and is not a flag
+            if i + 1 < len(sys.argv) and not sys.argv[i + 1].startswith('--'):
+                html_output = sys.argv[i + 1]
+            else:
+                html_output = f"{os.path.basename(filename)}.html"
     
     # Parse memory map
     memmap = MemoryMapParser.parse_file(filename)
+    
+    # Handle HTML output
+    if html_output:
+        HTMLGenerator.generate_html(memmap, crash_ctx, html_output)
+        return
     
     # Determine what to display
     # If no options given, default to --report

@@ -32,3 +32,8 @@ help:
 	@echo "  test    - Build and run comprehensive test suite"
 	@echo "  clean   - Remove build artifacts and crash dumps"
 	@echo "  help    - Show this help message"
+	@echo ""
+	@echo "HTML Report Generation:"
+	@echo "  Generate HTML visualization of crash dumps:"
+	@echo "    ./memmap_analyzer.py crash_dump_<PID>.maps --html report.html"
+	@echo "    ./memmap_analyzer.py crash_dump_<PID>.maps --pc 0x<ADDR> --html report.html"
