@@ -15,7 +15,7 @@ $(TARGET): test/crash_demo.c
 
 test: $(TARGET)
 	@echo "Running comprehensive crash analysis test suite..."
-	./run_all_tests.sh
+	./test/test_all.sh
 
 clean:
 	@echo "Cleaning build artifacts..."
@@ -35,5 +35,5 @@ help:
 	@echo ""
 	@echo "HTML Report Generation:"
 	@echo "  Generate HTML visualization of crash dumps:"
-	@echo "    ./memmap_analyzer.py crash_dump_<PID>.maps --html report.html"
-	@echo "    ./memmap_analyzer.py crash_dump_<PID>.maps --pc 0x<ADDR> --html report.html"
+	@echo "    ./pmap.py crash_dump_<PID>.maps --html report.html"
+	@echo "    ./pmap.py crash_dump_<PID>.maps --pc 0x<ADDR> --html report.html"

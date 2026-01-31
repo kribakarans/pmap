@@ -90,7 +90,7 @@ def main():
     pc = key_regs.get('Program Counter (PC)')
     if pc:
         print(f"To analyze crash location, use:")
-        print(f"  ./memmap_analyzer.py crash_dump_*.maps --pc {pc}")
+        print(f"  ./pmap.py crash_dump_*.maps --pc {pc}")
         print()
         print(f"Or with addr2line:")
         print(f"  addr2line -e ./crash_demo {pc}")

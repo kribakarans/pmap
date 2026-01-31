@@ -17,7 +17,7 @@ The **Memory Map Analyzer** is a crash debugging tool that:
 ### Run All Tests
 
 ```bash
-./test/test_analyzer.sh
+./test/test_all.sh
 ```
 
 This runs 9 test cases automatically and shows output for each.
@@ -26,25 +26,25 @@ This runs 9 test cases automatically and shows output for each.
 
 #### Test 1: Full Analysis (Default)
 ```bash
-./memmap_analyzer.py test/memmap.txt
+./pmap.py test/memmap.txt
 ```
 Shows: Table, Statistics, Grouped by Binary, ASCII Layout, Security Check
 
 #### Test 2: Segment Overview Only
 ```bash
-./memmap_analyzer.py memmap.txt --segments
+./pmap.py memmap.txt --segments
 ```
 Shows: Quick boxed view of all segments organized by type
 
 #### Test 3: ASCII Layout Only
 ```bash
-./memmap_analyzer.py memmap.txt --ascii
+./pmap.py memmap.txt --ascii
 ```
 Shows: Memory address diagram (High ↔ Low memory)
 
 #### Test 4: Program Counter (PC) Analysis
 ```bash
-./memmap_analyzer.py memmap.txt --pc 0xf79e245c
+./pmap.py memmap.txt --pc 0xf79e245c
 ```
 **Output:**
 ```
@@ -60,28 +60,28 @@ Program Counter (PC):
 
 #### Test 5: Link Register (LR) Analysis
 ```bash
-./memmap_analyzer.py memmap.txt --lr 0xf79e7f10
+./pmap.py memmap.txt --lr 0xf79e7f10
 ```
 
 **What it tells you:** Where execution will return to (the calling function)
 
 #### Test 6: Stack Pointer (SP) Analysis
 ```bash
-./memmap_analyzer.py memmap.txt --sp 0xff8b0000
+./pmap.py memmap.txt --sp 0xff8b0000
 ```
 
 **What it tells you:** Is the stack pointer within the stack segment? (Detects stack overflow)
 
 #### Test 7: Frame Pointer (FP) Analysis
 ```bash
-./memmap_analyzer.py memmap.txt --fp 0xff8b0010
+./pmap.py memmap.txt --fp 0xff8b0010
 ```
 
 **What it tells you:** Base address of the current stack frame
 
 #### Test 8: Full Crash Context
 ```bash
-./memmap_analyzer.py memmap.txt \
+./pmap.py memmap.txt \
   --pc 0xf79e245c \
   --lr 0xf79e7f10 \
   --sp 0xff8b0000 \
@@ -97,25 +97,25 @@ Program Counter (PC):
 
 #### Test 9: Error Handling - Unknown Option
 ```bash
-./memmap_analyzer.py memmap.txt --unknown
+./pmap.py memmap.txt --unknown
 ```
 
 **Output:**
 ```
 Error: Unknown option '--unknown'
-Usage: memmap_analyzer.py [options] <memory_dump_file>
+Usage: pmap.py [options] <memory_dump_file>
 ...
 ```
 
 #### Test 10: Error Handling - No File
 ```bash
-./memmap_analyzer.py --ascii
+./pmap.py --ascii
 ```
 
 **Output:**
 ```
 Error: No memory dump file specified
-Usage: memmap_analyzer.py [options] <memory_dump_file>
+Usage: pmap.py [options] <memory_dump_file>
 ...
 ```
 
@@ -147,10 +147,10 @@ ls crash_dump_*.maps
 
 ```bash
 # Get quick overview
-./memmap_analyzer.py crash_dump_12345.maps --segments
+./pmap.py crash_dump_12345.maps --segments
 
 # Analyze the crash (you get PC/LR from gdb or logs)
-./memmap_analyzer.py crash_dump_12345.maps \
+./pmap.py crash_dump_12345.maps \
   --pc 0x56559234 \
   --lr 0x56559250
 ```
@@ -189,7 +189,7 @@ It will:
 ### Analyze the Crash
 
 ```bash
-./memmap_analyzer.py crash_dump_*.maps --segments
+./pmap.py crash_dump_*.maps --segments
 ```
 
 ---
@@ -278,14 +278,14 @@ addr2line -e /lib/libubus.so.20230605 0x245c
 Make sure you're in the right directory:
 ```bash
 cd /home/labuser/workspace/memmap
-./memmap_analyzer.py memmap.txt
+./pmap.py memmap.txt
 ```
 
 ### "Unknown option --foo"
 
 Check valid options with:
 ```bash
-./memmap_analyzer.py --help
+./pmap.py --help
 ```
 
 ### "Error: No memory dump file specified"
@@ -293,10 +293,10 @@ Check valid options with:
 First argument must be a file, not a flag:
 ```bash
 # Wrong:
-./memmap_analyzer.py --pc 0x1234
+./pmap.py --pc 0x1234
 
 # Right:
-./memmap_analyzer.py memmap.txt --pc 0x1234
+./pmap.py memmap.txt --pc 0x1234
 ```
 
 ### addr2line returns "??:0"
@@ -313,7 +313,7 @@ gcc -g -O0 myprogram.c -o myprogram
 ### Finding a Crash in libubox
 
 ```bash
-./memmap_analyzer.py memmap.txt --pc 0xf79e7f10
+./pmap.py memmap.txt --pc 0xf79e7f10
 ```
 
 **Output shows:**
@@ -327,7 +327,7 @@ Debug command: addr2line -e /lib/libubox.so.20230523 0xf10
 ### Detecting Stack Issues
 
 ```bash
-./memmap_analyzer.py memmap.txt --sp 0xff8b0000 --fp 0xff8b0010
+./pmap.py memmap.txt --sp 0xff8b0000 --fp 0xff8b0010
 ```
 
 **Output shows:**
@@ -358,8 +358,8 @@ Or if there's a problem:
 
 ## Next Steps
 
-1. **Run the test suite:** `./test_analyzer.sh`
-2. **Test on the sample:** `./memmap_analyzer.py memmap.txt --pc 0xf79e245c`
+1. **Run the test suite:** `./test_all.sh`
+2. **Test on the sample:** `./pmap.py memmap.txt --pc 0xf79e245c`
 3. **Read the article:** See [ARTICLE_MEMORY_MAPS.md](ARTICLE_MEMORY_MAPS.md)
 4. **Create your crash program:** Use [crash_demo.c](crash_demo.c) as a template
 5. **Analyze real crashes:** Capture memory maps and use the analyzer
@@ -368,8 +368,8 @@ Or if there's a problem:
 
 ## Reference
 
-- **Tool:** [memmap_analyzer.py](memmap_analyzer.py)
+- **Tool:** [pmap.py](pmap.py)
 - **Documentation:** [TESTING_GUIDE.md](test/TESTING_GUIDE.md)
 - **Article:** [MEMORY_MAPS.md](MEMORY_MAPS.md)
 - **Sample Crash Program:** [test/crash_demo.c](test/crash_demo.c)
-- **Automated Tests:** [test/test_analyzer.sh](test/test_analyzer.sh)
+- **Automated Tests:** [test/test_all.sh](test/test_all.sh)

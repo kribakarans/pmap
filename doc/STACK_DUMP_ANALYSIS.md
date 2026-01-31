@@ -260,10 +260,10 @@ ltrace -p <PID> -o trace.txt          # Save to file
 
 ### perf Quick Reference
 ```bash
-sudo perf record -p <PID> -g -- sleep 10  # Record samples
+sudo perf record -p <PID> -g -- sleep 10   # Record samples
 sudo perf report                           # View results
 sudo perf script                           # Raw output
-sudo perf stat -p <PID> -- sleep 5        # Statistics
+sudo perf stat -p <PID> -- sleep 5         # Statistics
 sudo perf record -p <PID> -e malloc -g     # Profile malloc
 ```
 
@@ -1388,10 +1388,10 @@ Interpretation:
 ┌────────────────────────────────────────────────────────┐
 │         compute_algorithm (80% CPU time)               │
 │  ┌──────────────────────────────────────────────────┐  │
-│  │       inner_loop (70% CPU time)                 │  │
-│  │  ┌─────────────────────────────────────────┐   │  │
-│  │  │  tight_math_operation (60% CPU time)    │   │  │
-│  │  └─────────────────────────────────────────┘   │  │
+│  │       inner_loop (70% CPU time)                  │  │
+│  │  ┌─────────────────────────────────────────┐     │  │
+│  │  │  tight_math_operation (60% CPU time)    │     │  │
+│  │  └─────────────────────────────────────────┘     │  │
 │  └──────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────┘
 
@@ -1408,8 +1408,8 @@ Interpretation:
 ┌──────────────────────────────────────────┐
 │              main                        │
 ├──────┬───────────┬──────────┬────────────┤
-│ user │  kernel  │  futex   │   epoll   │
-│ 30%  │   20%    │   20%    │   30%     │
+│ user │  kernel   │  futex   │   epoll    │
+│ 30%  │   20%     │   20%    │   30%      │
 └──────┴───────────┴──────────┴────────────┘
 
 Interpretation:
@@ -4242,7 +4242,7 @@ cat /proc/$PID/status > "$CRASH_DIR/process_status.txt"
 cat /proc/$PID/smaps > "$CRASH_DIR/detailed_maps.txt"
 
 # Analyze memory map
-python3 memmap_analyzer.py "$CRASH_DIR/memmap.txt" --report
+python3 pmap.py "$CRASH_DIR/memmap.txt" --report
 
 echo "Analysis saved to: $CRASH_DIR/"
 ```
@@ -4581,7 +4581,7 @@ sudo perf record -p <PID> -c 1000000 -e cycles -- sleep 10
 
 ### Combining Methods with Memory Map Analysis
 
-#### Method 1: GDB + Memory Analyzer
+#### Method 1: GDB + pmap
 
 ```bash
 #!/bin/bash
@@ -4605,7 +4605,7 @@ FP=$(grep "rbp" gdb_output.txt | awk '{print $2}')
 readelf -l $BINARY > binary_layout.txt
 
 # Use your analyzer with extracted data
-python3 memmap_analyzer.py /proc/$$/maps \
+python3 pmap.py /proc/$$/maps \
     --pc $PC --sp $SP --fp $FP --html crash_analysis.html
 ```
 
@@ -4630,10 +4630,10 @@ cp /proc/$PID/maps memmap_after.txt
 diff -u memmap_before.txt memmap_after.txt
 
 # Analyze memory map
-python3 memmap_analyzer.py memmap_after.txt --table --stats
+python3 pmap.py memmap_after.txt --table --stats
 ```
 
-#### Method 3: perf + Memory Analyzer
+#### Method 3: perf + pmap
 
 ```bash
 #!/bin/bash
@@ -4655,7 +4655,7 @@ echo "=== Memory Layout Changes ==="
 diff -u initial_maps.txt final_maps.txt | grep "^[+-]" | grep -v "^[+-][+-][+-]"
 
 # Generate detailed visualization
-python3 memmap_analyzer.py final_maps.txt --ascii --grouped --html profile_analysis.html
+python3 pmap.py final_maps.txt --ascii --grouped --html profile_analysis.html
 ```
 
 ### Complete Workflow: Crash Detection + Analysis
@@ -4707,7 +4707,7 @@ if [ $EXIT_CODE -ne 0 ]; then
         gdb -batch -ex "core-file $CORE_FILE" -ex "info registers" > crash_regs.txt
         
         # Analyze memory map
-        python3 memmap_analyzer.py memmap_snapshot_5.txt \
+        python3 pmap.py memmap_snapshot_5.txt \
             --ascii --grouped --html crash_full_analysis.html
     fi
 fi
@@ -4855,7 +4855,7 @@ while true; do
         fi
         
         # Analyze
-        python3 memmap_analyzer.py "$CRASH_SUBDIR/memmap.txt" \
+        python3 pmap.py "$CRASH_SUBDIR/memmap.txt" \
             --html "$CRASH_SUBDIR/analysis.html"
         
         echo "Crash recorded: $CRASH_SUBDIR"

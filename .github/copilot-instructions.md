@@ -112,5 +112,5 @@ Make the crash visually understandable and immediately usable for root-cause ana
 Implementation:
 - Pure Python implementation (Python 3.7+)
 - No external dependencies (standard library only)
-- Single executable script: memmap_analyzer.py
+- Single executable script: pmap.py
 - Support for all output formats: table, ASCII, JSON, grouped view, statistics
