@@ -80,7 +80,10 @@ void signal_handler(int sig, siginfo_t *info, void *ctx) {
     fp = fopen(regfile, "w");
     if (fp) {
         fprintf(fp, "=== CRASH CONTEXT ===\n");
-        fprintf(fp, "Signal: %d (%s)\n", sig, sig == SIGSEGV ? "SIGSEGV" : "Unknown");
+        fprintf(fp, "Signal: %d (%s)\n", sig, 
+                sig == SIGSEGV ? "SIGSEGV" : 
+                sig == SIGABRT ? "SIGABRT" : 
+                sig == SIGFPE ? "SIGFPE" : "Unknown");
         fprintf(fp, "PID: %d\n\n", getpid());
         
         print_registers(context, fp);
@@ -114,6 +117,31 @@ void intermediate_function(void) {
     
     int *bad_pointer = NULL;  /* This will cause the crash */
     vulnerable_function(bad_pointer);
+}
+
+/* Function that triggers SIGABRT */
+void abort_function(void) {
+    printf(" → abort_function: triggering SIGABRT\n");
+    fflush(stdout);
+    
+    /* NOTE: SIGABRT is always delivered asynchronously by the kernel,
+     * so the PC will point to libc's signal delivery code, not user code.
+     * For a crash that points to user code, use SIGSEGV or SIGFPE instead.
+     */
+    raise(SIGABRT);
+    
+    printf("  (this line will never execute)\n");
+}
+
+/* Function that triggers SIGFPE - this WILL point to user code */
+void divide_by_zero_function(void) {
+    printf(" → divide_by_zero_function: triggering SIGFPE\n");
+    fflush(stdout);
+    
+    volatile int zero = 0;
+    volatile int result = 42 / zero;  /* This instruction will trigger SIGFPE */
+    
+    printf("  Result: %d (this line will never execute)\n", result);
 }
 
 /* Entry point of a crash chain */
@@ -152,8 +180,20 @@ int main(int argc, char *argv[]) {
     printf("\nTrigger the crash:\n");
     fflush(stdout);
     
-    /* This will trigger a segmentation fault */
-    entry_function();
+    /* Choose crash type based on argument */
+    if (argc > 1 && strcmp(argv[1], "abort") == 0) {
+        printf("→ Triggering SIGABRT...\n");
+        fflush(stdout);
+        abort_function();
+    } else if (argc > 1 && strcmp(argv[1], "divzero") == 0) {
+        printf("→ Triggering SIGFPE (divide by zero)...\n");
+        fflush(stdout);
+        divide_by_zero_function();
+    } else {
+        printf("→ Triggering SIGSEGV (NULL pointer dereference)...\n");
+        fflush(stdout);
+        entry_function();
+    }
     
     /* Never reached */
     return 0;
