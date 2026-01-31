@@ -172,6 +172,21 @@ class MemoryMapParser:
         return memmap
 
     @staticmethod
+    def parse_pid(pid: int) -> MemoryMap:
+        """Parse a memory map directly from a running process ID"""
+        maps_path = f"/proc/{pid}/maps"
+        memmap = MemoryMapParser.parse_file(maps_path)
+        memmap.pid = pid
+
+        try:
+            with open(f"/proc/{pid}/comm", "r") as f:
+                memmap.process_name = f.read().strip()
+        except OSError:
+            pass
+
+        return memmap
+
+    @staticmethod
     def parse_line(line: str) -> Optional[MemorySegment]:
         """Parse a single line from /proc/pid/maps"""
         match = MemoryMapParser.MAPS_RE.match(line)

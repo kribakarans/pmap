@@ -567,6 +567,16 @@ Runs the complete end-to-end test flow:
 - ASCII layout
 - Security analysis
 
+### Test 1b: Live PID Analysis (systemd)
+
+```bash
+./pmap.py --pid 1 --table
+```
+
+**Expected output:**
+- Tabular view of `/proc/1/maps`
+- Process name populated (systemd on most systems)
+
 ### Test 2: Program Counter Only
 
 ```bash

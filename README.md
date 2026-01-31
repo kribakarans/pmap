@@ -65,6 +65,12 @@ chmod +x pmap.py
 ```
 Shows: Table, Statistics, Grouped by Binary, ASCII Layout, Security Check
 
+### 1b. Analyze a Running Process (PID)
+```bash
+./pmap.py --pid 1
+```
+Shows: Live `/proc/1/maps` analysis (systemd on most systems)
+
 ### 2. Analyze a Crash (Program Counter)
 ```bash
 ./pmap.py test/pmap-sample.txt --pc 0xf79e245c
@@ -110,6 +116,9 @@ Output Options (each shows only its specific report):
   --security           Show security analysis only
   --html [file]        Generate HTML visualization (defaults to <mapfile>.html)
 
+Input Options:
+  --pid <pid>          Read /proc/<pid>/maps from a running process
+
 Crash Analysis Options (shows crash context analysis only):
   --pc <addr>          Program counter address (hex)
   --lr <addr>          Link register address (hex)
@@ -129,6 +138,9 @@ Crash Analysis Options (shows crash context analysis only):
 ./pmap.py test/pmap-sample.txt --table            # Table view only
 ./pmap.py test/pmap-sample.txt --stats            # Statistics only
 
+# Live process by PID
+./pmap.py --pid 1                                 # PID 1 (systemd)
+
 # Crash analysis (combinable)
 ./pmap.py test/pmap-sample.txt --pc 0xf79e245c                    # PC only
 ./pmap.py test/pmap-sample.txt --lr 0xf79e7f10                    # LR only
@@ -138,6 +150,7 @@ Crash Analysis Options (shows crash context analysis only):
 # HTML reports
 ./pmap.py test/pmap-sample.txt --html                              # Default filename
 ./pmap.py test/pmap-sample.txt --pc 0xf79e245c --html report.html  # Custom filename
+./pmap2html.py --pid 1 --html systemd.html                         # PID-based HTML
 
 # Help
 ./pmap.py --help

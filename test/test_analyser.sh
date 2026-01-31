@@ -49,4 +49,9 @@ run_section "Test 8: Error handling - unknown option" \
 run_section "Test 9: Error handling - no file" \
     "run_pmap --ascii 2>&1 | head -5 || true"
 
+run_section "Test 10: PID map fetch (systemd)" \
+    "systemd_pid=\$(pidof systemd | awk '{print \$1}'); \
+     if [[ -z \"\$systemd_pid\" ]]; then echo 'systemd not found'; exit 1; fi; \
+     run_pmap --pid \"\$systemd_pid\" --table | head -20"
+
 echo "=== Unit Tests Complete ==="

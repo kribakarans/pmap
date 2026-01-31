@@ -7,15 +7,25 @@ PMAP_TEST_VALIDATORS_SH=1
 
 validate_html_report() {
     local htmlfile="$1"
+    local mode="${2:-crash}"
     local missing=0
-    local checks=(
-        "Crash Context Analysis"
-        "Program Counter (PC)"
-        "Stack Pointer (SP)"
-        "Frame Pointer (FP)"
-        "addr2line"
-        "crash-marker"
-    )
+    local checks=()
+
+    if [[ "$mode" == "basic" ]]; then
+        checks=(
+            "Process Map Analysis"
+            "Memory Layout Visualization"
+        )
+    else
+        checks=(
+            "Crash Context Analysis"
+            "Program Counter (PC)"
+            "Stack Pointer (SP)"
+            "Frame Pointer (FP)"
+            "addr2line"
+            "crash-marker"
+        )
+    fi
 
     for check in "${checks[@]}"; do
         if grep -q "$check" "$htmlfile"; then

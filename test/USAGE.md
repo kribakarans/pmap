@@ -30,6 +30,12 @@ This runs 9 test cases automatically and shows output for each.
 ```
 Shows: Table, Statistics, Grouped by Binary, ASCII Layout, Security Check
 
+#### Test 1b: Live PID Analysis (systemd)
+```bash
+./pmap.py --pid 1 --table
+```
+Shows: Live `/proc/1/maps` table output
+
 #### Test 2: Segment Overview Only
 ```bash
 ./pmap.py test/pmap-sample.txt --segments
