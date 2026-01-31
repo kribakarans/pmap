@@ -4,3 +4,4 @@
 *.regs
 *.html
 crash_demo
+__pycache__

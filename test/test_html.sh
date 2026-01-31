@@ -12,6 +12,7 @@ REPORT_NAME="crash_verify.html"
 echo "=== HTML Crash Report Test ==="
 
 ensure_analyzer
+ensure_html_tool
 ensure_crash_demo_compiled
 
 echo "[1/2] Run crash demo (generates crash_dump_*.maps/.regs)"

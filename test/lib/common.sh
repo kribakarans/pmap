@@ -8,6 +8,7 @@ PMAP_TEST_COMMON_SH=1
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$(cd "$TEST_DIR/.." && pwd)"
 ANALYZER="$PROJECT_DIR/pmap.py"
+HTML_TOOL="$PROJECT_DIR/pmap2html.py"
 SAMPLE_DUMP="$PROJECT_DIR/memmap.txt"
 CRASH_DEMO="$TEST_DIR/crash_demo.out"
 CRASH_SRC="$TEST_DIR/crash_demo.c"
@@ -27,6 +28,10 @@ ensure_file() {
 
 ensure_analyzer() {
     ensure_file "$ANALYZER" "pmap.py"
+}
+
+ensure_html_tool() {
+    ensure_file "$HTML_TOOL" "pmap2html.py"
 }
 
 ensure_sample_dump() {
@@ -80,5 +85,5 @@ generate_html_report() {
     local sp="$3"
     local fp="$4"
     local output="$5"
-    run_pmap "$mapfile" --pc "0x$pc" --sp "0x$sp" --fp "0x$fp" --html "$output"
+    python3 "$HTML_TOOL" "$mapfile" --pc "0x$pc" --sp "0x$sp" --fp "0x$fp" --html "$output"
 }
