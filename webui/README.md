@@ -2,14 +2,26 @@
 
 A static, client-side web application for visualizing Linux process memory maps interactively. Built with vanilla HTML5, CSS3, and JavaScript (no dependencies).
 
+## Architecture
+
+The webapp follows the same architecture as the Python tools (`pmap2html.py` and `lib/api.py`):
+
+- **index.html**: Input interface (file upload / paste memory map data)
+- **script.js**: 
+  - `MemoryMapParser`: Parses `/proc/<pid>/maps` format
+  - `MemoryMapAnalyzer`: Analyzes and generates statistics
+  - `HTMLGenerator`: Generates HTML using `lib/pmap.html.in` template
+- **lib/pmap.html.in**: Shared HTML template (same as Python tools)
+
 ## Features
 
 - **File Upload**: Drag & drop or select `.maps` files
 - **Paste Input**: Copy-paste memory map data directly
-- **Report Output**: Opens in a new tab using the pmap.html template
+- **Template-based Output**: Uses `lib/pmap.html.in` (same as pmap2html.py)
 - **Memory Visualization**: Color-coded segments by type (CODE, DATA, HEAP, STACK, etc.)
 - **Statistics**: View memory usage statistics by type
 - **Details Table**: Complete table of all memory segments
+- **Auto-save**: Downloads `pmap-report.map` file on visualization
 - **Responsive Design**: Works on desktop, tablet, and mobile
 - **Fast & Lightweight**: No backend server required, runs entirely in browser
 
@@ -22,7 +34,8 @@ A static, client-side web application for visualizing Linux process memory maps 
     - Upload a `.maps` file (e.g., from `cat /proc/PID/maps > dump.txt`)
     - Paste memory map content directly
 3. Click "Visualise" to generate the report
-4. The report opens in a new tab using `pmap.html`
+4. The report opens in a new tab (using `lib/pmap.html.in` template)
+5. Optional: `pmap-report.map` file downloads automatically
 
 ### Getting Memory Map Data
 
@@ -36,6 +49,44 @@ From a crash dump file:
 ./pmap.py crash_dump.maps
 ```
 
+## Implementation Details
+
+### Template Loading
+
+The webapp loads the HTML template from `../lib/pmap.html.in`:
+```javascript
+const response = await fetch('../lib/pmap.html.in');
+const template = await response.text();
+```
+
+### HTML Generation
+
+The `HTMLGenerator` class mirrors the Python API structure:
+```javascript
+HTMLGenerator.generateHtml(memmap, crashCtx, template)
+  ├── _generateSegmentsHtml()
+  ├── _generateStatisticsHtml()
+  ├── _generateCrashHtml()
+  ├── _generateFilesHtml()
+  ├── _generateTableHtml()
+  └── _generateLegendHtml()
+```
+
+### Template Placeholders
+
+Same as Python API:
+- `{{TITLE}}` - Page title
+- `{{PROCESS_NAME}}` - Process name
+- `{{PID}}` - Process ID
+- `{{GENERATED}}` - Timestamp
+- `{{STATS_HTML}}` - Statistics cards
+- `{{CRASH_HTML}}` - Crash context (future)
+- `{{FILES_HTML}}` - Files section
+- `{{MEMORY_VIS}}` - Memory visualization
+- `{{LEGEND_HTML}}` - Legend
+- `{{DETAILS_TABLE}}` - Detailed table
+- `{{LOW_ADDR}}` / `{{HIGH_ADDR}}` - Address range
+
 ## Deployment to GitHub Pages
 
 ### Option 1: Serve from Root
@@ -44,10 +95,10 @@ From a crash dump file:
 2. Enable GitHub Pages on main branch
 3. Access at `https://username.github.io/memmap/`
 
-### Option 2: Serve from `/webapp/` Directory
+### Option 2: Serve from `/webui/` Directory
 
-1. Keep webapp in `/webapp/` folder
-2. Configure GitHub Pages to serve from `/webapp/` branch
+1. Keep webapp in `/webui/` folder
+2. Configure GitHub Pages to serve from `/webui/` branch
 3. Access at `https://username.github.io/memmap/webapp/`
 
 ### Option 3: Create `gh-pages` Branch

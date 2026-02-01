@@ -508,13 +508,38 @@ class HTMLGenerator:
         with open(output_file, 'w') as f:
             f.write(html_content)
 
-        print(f"\n✓ HTML visualization saved to: {output_file}")
+        print(f"\nHTML visualization saved to: {output_file}")
         print(f"  Open in browser: file://{os.path.abspath(output_file)}\n")
+
+    @staticmethod
+    def link_to_report(html_output: str):
+        """Link output file to report.html for easy access"""
+        import os
+        import shutil
+
+        if html_output == "report.html":
+            return
+
+        try:
+            # Remove existing report.html if it exists
+            if os.path.exists("report.html"):
+                os.remove("report.html")
+            # Create symlink to the generated report
+            os.symlink(os.path.abspath(html_output), "report.html")
+            print(f"Linked to: report.html")
+        except Exception as e:
+            # If symlink fails (e.g., on Windows), try creating a copy
+            try:
+                shutil.copy(html_output, "report.html")
+                print(f"Copied to: report.html")
+            except Exception as copy_err:
+                print(f"Could not link/copy to report.html: {copy_err}", file=sys.stderr)
 
     @staticmethod
     def _generate_html_content(memmap: MemoryMap, crash_ctx: Optional[CrashContext],
                                min_addr: int, max_addr: int, total_range: int) -> str:
         """Generate complete HTML content"""
+        import os
         from datetime import datetime
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -525,334 +550,33 @@ class HTMLGenerator:
 
         stats_html = HTMLGenerator._generate_statistics_html(memmap)
         crash_html = HTMLGenerator._generate_crash_html(memmap, crash_ctx)
+        files_html = HTMLGenerator._generate_files_html(memmap)
         table_html = HTMLGenerator._generate_table_html(memmap)
 
-        return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Process Map Analysis - {memmap.process_name or 'Process'}</title>
-    <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }}
+        # Load template from webui/pmap.html.in (shared with JavaScript webapp)
+        template_path = os.path.join(os.path.dirname(__file__), "..", "webui", "pmap.html.in")
+        with open(template_path, "r", encoding="utf-8") as template_file:
+            template = template_file.read()
 
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 10px;
-            color: #333;
-            font-size: 15px;
-        }}
+        replacements = {
+            "TITLE": f"pmap2html - {memmap.process_name or 'Process'}",
+            "PROCESS_NAME": memmap.process_name or "Unknown",
+            "PID": str(memmap.pid or "N/A"),
+            "GENERATED": timestamp,
+            "STATS_HTML": stats_html,
+            "CRASH_HTML": crash_html,
+            "FILES_HTML": files_html,
+            "MEMORY_VIS": segments_html,
+            "LEGEND_HTML": HTMLGenerator._generate_legend_html(),
+            "DETAILS_TABLE": table_html,
+            "LOW_ADDR": f"0x{min_addr:016x}",
+            "HIGH_ADDR": f"0x{max_addr:016x}",
+        }
 
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }}
+        for key, value in replacements.items():
+            template = template.replace(f"{{{{{key}}}}}", value)
 
-        .header {{
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-        }}
-
-        .header h1 {{
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }}
-
-        .header .info {{
-            font-size: 0.9em;
-            opacity: 0.9;
-        }}
-
-        .content {{
-            padding: 15px;
-        }}
-
-        .section {{
-            margin-bottom: 20px;
-        }}
-
-        .section-title {{
-            font-size: 1.4em;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }}
-
-        .memory-viz {{
-            background: #f8f9fa;
-            border-radius: 5px;
-            padding: 10px;
-            position: relative;
-        }}
-
-        .memory-scale {{
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 5px;
-            font-family: monospace;
-            font-size: 0.85em;
-            color: #666;
-            gap: 0px;
-        }}
-
-        .memory-scale-top {{
-            margin-bottom: 3px;
-        }}
-
-        .memory-scale-bottom {{
-            margin-top: 3px;
-        }}
-
-        .memory-container {{
-            background: white;
-            border: 2px solid #2c3e50;
-            border-radius: 3px;
-            overflow-y: auto;
-            overflow-x: auto;
-            max-height: 600px;
-            font-family: monospace;
-        }}
-
-        .segment-group {{
-            border-bottom: 2px solid #2c3e50;
-        }}
-
-        .segment-group:last-child {{
-            border-bottom: none;
-        }}
-
-        .segment-group-header {{
-            background: #34495e;
-            color: white;
-            padding: 6px 12px;
-            font-weight: bold;
-            font-size: 0.95em;
-            border-bottom: 2px solid #2c3e50;
-        }}
-
-        .segment {{
-            padding: 3px 12px;
-            font-size: 0.85em;
-            border-bottom: 1px solid #ecf0f1;
-            line-height: 1.5;
-            white-space: nowrap;
-            min-width: max-content;
-        }}
-
-        .segment:last-child {{
-            border-bottom: none;
-        }}
-
-        .segment-addr {{
-            display: inline-block;
-            width: 230px;
-            color: #1f2a33;
-        }}
-
-        .segment-perms {{
-            display: inline-block;
-            width: 45px;
-            font-weight: bold;
-            color: #1f2a33;
-        }}
-
-        .segment-type {{
-            display: inline-block;
-            width: 65px;
-            font-weight: 600;
-            color: #1f2a33;
-        }}
-
-        .segment-path {{
-            display: inline-block;
-            color: #2b2b2b;
-        }}
-
-        .crash-marker {{
-            display: inline-block;
-            padding: 2px 6px;
-            background: #ff0000;
-            border-radius: 3px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8em;
-            margin-left: 6px;
-            box-shadow: 0 1px 3px rgba(255,0,0,0.5);
-        }}
-
-        .legend {{
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 8px;
-        }}
-
-        .legend-item {{
-            display: flex;
-            align-items: flex-start;
-            gap: 5px;
-            font-size: 0.8em;
-            line-height: 1.3;
-        }}
-
-        .legend-color {{
-            flex-shrink: 0;
-            width: 18px;
-            height: 12px;
-            border-radius: 2px;
-            border: 1px solid rgba(0,0,0,0.2);
-            margin-top: 2px;
-        }}
-
-        .legend-text {{
-            flex: 1;
-        }}
-
-        .stats-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 8px;
-        }}
-
-        .stat-card {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }}
-
-        .stat-card h3 {{
-            font-size: 0.7em;
-            opacity: 0.9;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }}
-
-        .stat-card .value {{
-            font-size: 1.4em;
-            font-weight: bold;
-        }}
-
-        .crash-info {{
-            background: #fff3cd;
-            border-left: 3px solid #ff9800;
-            padding: 8px 10px;
-            border-radius: 3px;
-            margin-bottom: 8px;
-        }}
-
-        .crash-info h3 {{
-            color: #ff6f00;
-            margin-bottom: 6px;
-            font-size: 0.95em;
-        }}
-
-        .crash-detail {{
-            font-family: monospace;
-            background: white;
-            padding: 6px 8px;
-            border-radius: 2px;
-            margin: 3px 0;
-            font-size: 0.8em;
-            line-height: 1.4;
-        }}
-
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            font-size: 0.75em;
-        }}
-
-        table th {{
-            background: #2c3e50;
-            color: white;
-            padding: 6px 8px;
-            text-align: left;
-            position: sticky;
-            top: 0;
-            font-size: 0.9em;
-        }}
-
-        table td {{
-            padding: 4px 8px;
-            border-bottom: 1px solid #eee;
-        }}
-
-        table tbody tr:hover {{
-            background: #f8f9fa;
-        }}
-
-        .monospace {{
-            font-family: monospace;
-        }}
-
-        .footer {{
-            background: #f8f9fa;
-            padding: 8px;
-            text-align: center;
-            color: #666;
-            border-top: 1px solid #ddd;
-            font-size: 0.75em;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Process Map Analysis</h1>
-            <div class="info">
-                Process: <strong>{memmap.process_name or 'Unknown'}</strong> |
-                PID: <strong>{memmap.pid or 'N/A'}</strong> |
-                Generated: <strong>{timestamp}</strong>
-            </div>
-        </div>
-
-        <div class="content">
-            {stats_html}
-
-            {crash_html}
-
-            <div class="section">
-                <h2 class="section-title">📊 Memory Layout Visualization</h2>
-                <div class="memory-viz">
-                    <div class="memory-scale">
-                        <span class="memory-scale-top">⬇️ High Memory: 0x{max_addr:016x}</span>
-                    </div>
-                    <div class="memory-container">
-                        {segments_html}
-                    </div>
-                    <div class="memory-scale">
-                        <span class="memory-scale-bottom">⬆️ Low Memory: 0x{min_addr:016x}</span>
-                    </div>
-                    <div class="legend">
-                        {HTMLGenerator._generate_legend_html()}
-                    </div>
-                </div>
-            </div>
-
-            {table_html}
-        </div>
-
-        <div class="footer">
-            Generated by Process Map Analyzer v1.0
-        </div>
-    </div>
-</body>
-</html>"""
+        return template
 
     @staticmethod
     def _generate_segments_html(memmap: MemoryMap, crash_ctx: Optional[CrashContext],
@@ -893,19 +617,27 @@ class HTMLGenerator:
                 if seg.start <= addr < seg.end:
                     markers_html += f' <span class="crash-marker" title="0x{addr:016x}">{label}</span>'
 
-            type_colored = f'<span>{seg.seg_type.value}</span>'
+            type_colored = f'{seg.seg_type.value}'
+            
+            # Format size in human-readable format
+            size_kb = seg.size / 1024
+            if size_kb >= 1024:
+                size_str = f"{size_kb / 1024:.2f} MB"
+            else:
+                size_str = f"{size_kb:.2f} KB"
 
-            return f'''<div class="segment" style="background-color: {color}33; border-left: 3px solid {color};">
-                <span class="segment-addr">0x{seg.start:08x}-0x{seg.end:08x}</span>
-                <span class="segment-perms">{seg.perms}</span>
-                <span class="segment-type">{type_colored}</span>
-                <span class="segment-path">{name}</span>{markers_html}
-            </div>'''
+            return f'''<tr class="segment-row" style="background-color: {color}33;">
+                <td class="segment-addr" style="border-left: 3px solid {color};">0x{seg.start:016x}-0x{seg.end:016x} ({size_str})</td>
+                <td class="segment-perms">{seg.perms}</td>
+                <td class="segment-type">{type_colored}</td>
+                <td class="segment-path">{name}{markers_html}</td>
+            </tr>'''
 
         groups = [
-            ("Stack", [seg for seg in memmap.segments if seg.seg_type == SegmentType.STACK]),
-            ("Shared Libraries", [seg for seg in memmap.segments if is_shared_lib(seg)]),
-            ("Heap", [seg for seg in memmap.segments if seg.seg_type == SegmentType.HEAP]),
+            (
+                "Code (.text)",
+                [seg for seg in memmap.segments if seg.seg_type == SegmentType.CODE and not is_shared_lib(seg)],
+            ),
             (
                 "BSS / Data",
                 [
@@ -915,10 +647,9 @@ class HTMLGenerator:
                     and not is_shared_lib(seg)
                 ],
             ),
-            (
-                "Code (.text)",
-                [seg for seg in memmap.segments if seg.seg_type == SegmentType.CODE and not is_shared_lib(seg)],
-            ),
+            ("Heap", [seg for seg in memmap.segments if seg.seg_type == SegmentType.HEAP]),
+            ("Shared Libraries", [seg for seg in memmap.segments if is_shared_lib(seg)]),
+            ("Stack", [seg for seg in memmap.segments if seg.seg_type == SegmentType.STACK]),
         ]
 
         html_parts = []
@@ -926,12 +657,11 @@ class HTMLGenerator:
             if not segments:
                 continue
 
-            group_html = f'<div class="segment-group">'
-            group_html += f'<div class="segment-group-header">{title}</div>'
-            for seg in segments:
-                group_html += format_segment(seg)
-            group_html += '</div>'
-            html_parts.append(group_html)
+            html_parts.append(
+                f'<tr class="segment-group-row"><td class="segment-group-header" colspan="4">{title}</td></tr>'
+            )
+            for seg in sorted(segments, key=lambda s: s.start):
+                html_parts.append(format_segment(seg))
 
         return "\n".join(html_parts)
 
@@ -984,20 +714,116 @@ class HTMLGenerator:
                 <div class="value">{memmap.total_size / (1024*1024):.1f} MB</div>
             </div>""")
 
-        for seg_type in [SegmentType.CODE, SegmentType.DATA, SegmentType.HEAP, SegmentType.STACK]:
-            if seg_type.value in type_stats:
-                stats = type_stats[seg_type.value]
-                stats_cards.append(f"""
-                    <div class="stat-card">
-                        <h3>{seg_type.value}</h3>
-                        <div class="value">{stats['size'] / 1024:.0f} KB</div>
-                    </div>""")
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>CODE</h3>
+                <div class="value">{type_stats.get(SegmentType.CODE.value, {}).get('size', 0) / 1024:.0f} KB</div>
+            </div>""")
+
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>DATA</h3>
+                <div class="value">{type_stats.get(SegmentType.DATA.value, {}).get('size', 0) / 1024:.0f} KB</div>
+            </div>""")
+
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>HEAP</h3>
+                <div class="value">{type_stats.get(SegmentType.HEAP.value, {}).get('size', 0) / 1024:.0f} KB</div>
+            </div>""")
+
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>BINARIES</h3>
+                <div class="value">{len({seg.pathname for seg in memmap.segments if seg.pathname and not seg.pathname.startswith('[')})}</div>
+            </div>""")
+
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>STACK</h3>
+                <div class="value">{type_stats.get(SegmentType.STACK.value, {}).get('size', 0) / 1024:.0f} KB</div>
+            </div>""")
+
+        stats_cards.append(f"""
+            <div class="stat-card">
+                <h3>ANON</h3>
+                <div class="value">{type_stats.get(SegmentType.ANON.value, {}).get('size', 0) / 1024:.0f} KB</div>
+            </div>""")
 
         return f"""
             <div class="section">
-                <h2 class="section-title">📈 Statistics</h2>
+                <h2 class="section-title">📈 Memory Stats</h2>
                 <div class="stats-grid">
                     {" ".join(stats_cards)}
+                </div>
+            </div>"""
+
+    @staticmethod
+    def _generate_files_html(memmap: MemoryMap) -> str:
+        """Generate files section HTML"""
+        files = {}
+        for seg in memmap.segments:
+            if not seg.pathname or seg.pathname.startswith('['):
+                continue
+            entry = files.setdefault(seg.pathname, {"types": set(), "size": 0, "segments": 0})
+            entry["types"].add(seg.seg_type)
+            entry["size"] += seg.size
+            entry["segments"] += 1
+
+        def pick_type(types):
+            priority = [
+                SegmentType.CODE,
+                SegmentType.DATA,
+                SegmentType.RODATA,
+                SegmentType.BSS,
+                SegmentType.HEAP,
+                SegmentType.STACK,
+                SegmentType.ANON,
+                SegmentType.VDSO,
+                SegmentType.UNKNOWN,
+            ]
+            for seg_type in priority:
+                if seg_type in types:
+                    return seg_type
+            return SegmentType.UNKNOWN
+
+        if not files:
+            return """
+                <div class="section">
+                    <h2 class="section-title">📁 Files</h2>
+                    <div class="crash-detail">No file-backed mappings found.</div>
+                </div>"""
+
+        rows = []
+        for pathname in sorted(files.keys()):
+            info = files[pathname]
+            seg_type = pick_type(info["types"])
+            color = HTMLGenerator.SEGMENT_COLORS.get(seg_type, "#607D8B")
+            rows.append(f"""
+                <tr style=\"background-color: {color}33;\">
+                    <td style=\"border-left: 3px solid {color};\">{pathname}</td>
+                    <td class=\"monospace\">{info['segments']}</td>
+                    <td class=\"monospace\">{info['size']:,}</td>
+                    <td class=\"monospace\">{seg_type.value}</td>
+                </tr>""")
+
+        return f"""
+            <div class="section">
+                <h2 class="section-title">📁 Files</h2>
+                <div style=\"overflow-x: auto;\">
+                    <table class=\"files-table\">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Segments</th>
+                                <th>Total Size (bytes)</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {"".join(rows)}
+                        </tbody>
+                    </table>
                 </div>
             </div>"""
 
@@ -1044,7 +870,7 @@ class HTMLGenerator:
 
         return f"""
             <div class="section">
-                <h2 class="section-title">🔍 Crash Context Analysis</h2>
+                <h2 class="section-title">🔍 Crash Context</h2>
                 <div class="crash-info">
                     <h3>Register Analysis</h3>
                     {"".join(crash_details)}
@@ -1070,7 +896,7 @@ class HTMLGenerator:
 
         return f"""
             <div class="section">
-                <h2 class="section-title">📋 Detailed Segment Table</h2>
+                <h2 class="section-title">📋 Detailed Segment</h2>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>

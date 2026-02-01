@@ -235,6 +235,7 @@ class HTMLGenerator {
         return {
             visualization: this.generateMemoryVisualization(memoryMap),
             statistics: this.generateStatistics(stats),
+            files: this.generateFilesSection(memoryMap),
             binaries: this.generateBinariesView(stats),
             details: this.generateDetailsTable(memoryMap),
             legend: this.generateLegend()
@@ -249,21 +250,18 @@ class HTMLGenerator {
         let html = '';
 
         for (const [binary, segments] of Object.entries(groupedSegments)) {
-            html += `<div class="segment-group">`;
-            html += `<div class="segment-group-header">${this.escapeHtml(binary)}</div>`;
+            html += `<tr class="segment-group-row"><td class="segment-group-header" colspan="4">${this.escapeHtml(binary)}</td></tr>`;
 
             for (const seg of segments) {
                 const marker = '';
                 const color = SEGMENT_COLORS[seg.type] || SEGMENT_COLORS[SEGMENT_TYPES.UNKNOWN];
-                html += `<div class="segment" style="background-color: ${color}33; border-left: 3px solid ${color};">`;
-                html += `<span class="segment-addr">${MemoryMapAnalyzer.formatAddr(seg.start)}-${MemoryMapAnalyzer.formatAddr(seg.end)} (${MemoryMapAnalyzer.formatSize(seg.size)})</span>`;
-                html += `<span class="segment-perms">${seg.permissions}</span>`;
-                html += `<span class="segment-type"><span>${seg.type}</span></span>`;
-                html += `<span class="segment-path">${this.escapeHtml(seg.path)}</span>`;
-                html += marker;
-                html += `</div>`;
+                html += `<tr class="segment-row" style="background-color: ${color}33;">`;
+                html += `<td class="segment-addr" style="border-left: 3px solid ${color};">${MemoryMapAnalyzer.formatAddr(seg.start)}-${MemoryMapAnalyzer.formatAddr(seg.end)} (${MemoryMapAnalyzer.formatSize(seg.size)})</td>`;
+                html += `<td class="segment-perms">${seg.permissions}</td>`;
+                html += `<td class="segment-type"><span>${seg.type}</span></td>`;
+                html += `<td class="segment-path">${this.escapeHtml(seg.path)}${marker}</td>`;
+                html += `</tr>`;
             }
-            html += `</div>`;
         }
 
         return html;
@@ -312,6 +310,9 @@ class HTMLGenerator {
      * Generate statistics cards
      */
     static generateStatistics(stats) {
+        const sizeKB = (bytes) => Math.round(bytes / 1024);
+        const totalMB = (bytes) => (bytes / (1024 * 1024)).toFixed(1);
+
         const cards = [
             {
                 title: 'Total Segments',
@@ -319,44 +320,51 @@ class HTMLGenerator {
             },
             {
                 title: 'Total Memory',
-                value: MemoryMapAnalyzer.formatSize(stats.totalMemory)
+                value: `${totalMB(stats.totalMemory)} MB`
             },
             {
-                title: 'Code Segments',
-                value: stats.segmentsByType[SEGMENT_TYPES.CODE].count
+                title: 'CODE',
+                value: `${sizeKB(stats.segmentsByType[SEGMENT_TYPES.CODE].size)} KB`
             },
             {
-                title: 'Data Segments',
-                value: stats.segmentsByType[SEGMENT_TYPES.DATA].count
+                title: 'DATA',
+                value: `${sizeKB(stats.segmentsByType[SEGMENT_TYPES.DATA].size)} KB`
             },
             {
-                title: 'Binaries',
+                title: 'HEAP',
+                value: `${sizeKB(stats.segmentsByType[SEGMENT_TYPES.HEAP].size)} KB`
+            },
+            {
+                title: 'BINARIES',
                 value: Object.keys(stats.binaries).length
             },
             {
-                title: 'Heap Size',
-                value: MemoryMapAnalyzer.formatSize(stats.segmentsByType[SEGMENT_TYPES.HEAP].size)
+                title: 'STACK',
+                value: `${sizeKB(stats.segmentsByType[SEGMENT_TYPES.STACK].size)} KB`
             },
             {
-                title: 'Stack Size',
-                value: MemoryMapAnalyzer.formatSize(stats.segmentsByType[SEGMENT_TYPES.STACK].size)
-            },
-            {
-                title: 'Anonymous Mem',
-                value: MemoryMapAnalyzer.formatSize(stats.segmentsByType[SEGMENT_TYPES.ANON].size)
+                title: 'ANON',
+                value: `${sizeKB(stats.segmentsByType[SEGMENT_TYPES.ANON].size)} KB`
             }
         ];
 
-        let html = '';
+        let cardsHtml = '';
         for (const card of cards) {
-            html += `
+            cardsHtml += `
                 <div class="stat-card">
                     <h3>${card.title}</h3>
                     <div class="value">${card.value}</div>
                 </div>
             `;
         }
-        return html;
+
+        return `
+            <div class="section">
+                <h2 class="section-title">📈 Memory Stats</h2>
+                <div class="stats-grid">
+                    ${cardsHtml}
+                </div>
+            </div>`;
     }
 
     /**
@@ -447,6 +455,84 @@ class HTMLGenerator {
         return html;
     }
 
+    static generateFilesSection(memoryMap) {
+        const files = {};
+
+        for (const seg of memoryMap.segments) {
+            if (!seg.path || seg.path.startsWith('[')) {
+                continue;
+            }
+            if (!files[seg.path]) {
+                files[seg.path] = { types: new Set(), size: 0, segments: 0 };
+            }
+            files[seg.path].types.add(seg.type);
+            files[seg.path].size += seg.size;
+            files[seg.path].segments += 1;
+        }
+
+        const pickType = (typesSet) => {
+            const priority = [
+                SEGMENT_TYPES.CODE,
+                SEGMENT_TYPES.DATA,
+                SEGMENT_TYPES.RODATA,
+                SEGMENT_TYPES.BSS,
+                SEGMENT_TYPES.HEAP,
+                SEGMENT_TYPES.STACK,
+                SEGMENT_TYPES.ANON,
+                SEGMENT_TYPES.VDSO,
+                SEGMENT_TYPES.UNKNOWN
+            ];
+            for (const t of priority) {
+                if (typesSet.has(t)) return t;
+            }
+            return SEGMENT_TYPES.UNKNOWN;
+        };
+
+        const fileEntries = Object.keys(files).sort();
+
+        if (fileEntries.length === 0) {
+            return `
+                <div class="section">
+                    <h2 class="section-title">📁 Files</h2>
+                    <div class="crash-detail">No file-backed mappings found.</div>
+                </div>`;
+        }
+
+        let rows = '';
+        for (const path of fileEntries) {
+            const info = files[path];
+            const segType = pickType(info.types);
+            const color = SEGMENT_COLORS[segType] || SEGMENT_COLORS[SEGMENT_TYPES.UNKNOWN];
+            rows += `
+                <tr style="background-color: ${color}33;">
+                    <td style="border-left: 3px solid ${color};">${this.escapeHtml(path)}</td>
+                    <td class="monospace">${info.segments}</td>
+                    <td class="monospace">${info.size.toLocaleString()}</td>
+                    <td class="monospace">${segType}</td>
+                </tr>`;
+        }
+
+        return `
+            <div class="section">
+                <h2 class="section-title">📁 Files</h2>
+                <div style="overflow-x: auto;">
+                    <table class="files-table">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Segments</th>
+                                <th>Total Size (bytes)</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+    }
+
     static legendDescription(type) {
         switch (type) {
             case SEGMENT_TYPES.CODE:
@@ -470,31 +556,97 @@ class HTMLGenerator {
         }
     }
 
-    static generateFullReportHtml(memoryMap, stats, template) {
+    /**
+     * Generate HTML report (matching Python API structure)
+     * @param {Object} memmap - Memory map object
+     * @param {Object} crashCtx - Crash context (optional, for future use)
+     * @param {string} template - HTML template content
+     */
+    static generateHtml(memmap, crashCtx, template) {
+        const stats = MemoryMapAnalyzer.analyze(memmap);
         const timestamp = new Date().toLocaleString();
-        const visualization = this.generateMemoryVisualization(memoryMap);
-        const legend = this.generateLegend();
-        const statsHtml = this.generateStatistics(stats);
-        const detailsTable = this.generateDetailsTable(memoryMap);
-        const minAddr = MemoryMapAnalyzer.formatAddr(memoryMap.minAddr);
-        const maxAddr = MemoryMapAnalyzer.formatAddr(memoryMap.maxAddr);
+        const minAddr = MemoryMapAnalyzer.formatAddr(memmap.minAddr);
+        const maxAddr = MemoryMapAnalyzer.formatAddr(memmap.maxAddr);
 
+        // Generate all HTML sections using methods matching Python API
+        const segmentsHtml = this._generateSegmentsHtml(memmap, crashCtx);
+        const statsHtml = this._generateStatisticsHtml(stats);
+        const crashHtml = this._generateCrashHtml(memmap, crashCtx);
+        const filesHtml = this._generateFilesHtml(memmap);
+        const tableHtml = this._generateTableHtml(memmap);
+        const legendHtml = this._generateLegendHtml();
+
+        // Template replacements matching Python API
         const replacements = {
-            TITLE: `PMAP2HTML - ${memoryMap.processName}`,
-            PROCESS_NAME: this.escapeHtml(memoryMap.processName),
+            TITLE: `pmap2html - ${memmap.processName || 'Process'}`,
+            PROCESS_NAME: this.escapeHtml(memmap.processName || 'Unknown'),
             PID: 'N/A',
             GENERATED: timestamp,
             STATS_HTML: statsHtml,
-            MEMORY_VIS: visualization,
-            LEGEND_HTML: legend,
-            DETAILS_TABLE: detailsTable,
+            CRASH_HTML: crashHtml,
+            FILES_HTML: filesHtml,
+            MEMORY_VIS: segmentsHtml,
+            LEGEND_HTML: legendHtml,
+            DETAILS_TABLE: tableHtml,
             LOW_ADDR: minAddr,
             HIGH_ADDR: maxAddr
         };
 
+        // Replace template placeholders
         return template.replace(/\{\{(\w+)\}\}/g, (match, key) => (
             Object.prototype.hasOwnProperty.call(replacements, key) ? replacements[key] : match
         ));
+    }
+
+    /**
+     * Generate segments HTML (internal method matching Python API)
+     */
+    static _generateSegmentsHtml(memmap, crashCtx) {
+        return this.generateMemoryVisualization(memmap);
+    }
+
+    /**
+     * Generate statistics HTML (internal method matching Python API)
+     */
+    static _generateStatisticsHtml(stats) {
+        return this.generateStatistics(stats);
+    }
+
+    /**
+     * Generate crash context HTML (internal method matching Python API)
+     */
+    static _generateCrashHtml(memmap, crashCtx) {
+        // Crash context support for future enhancement
+        return '';
+    }
+
+    /**
+     * Generate files section HTML (internal method matching Python API)
+     */
+    static _generateFilesHtml(memmap) {
+        return this.generateFilesSection(memmap);
+    }
+
+    /**
+     * Generate details table HTML (internal method matching Python API)
+     */
+    static _generateTableHtml(memmap) {
+        return `
+            <div class="section">
+                <h2 class="section-title">📋 Detailed Segment Table</h2>
+                <div style="overflow-x: auto;">
+                    <table class="files-table">
+                        ${this.generateDetailsTable(memmap)}
+                    </table>
+                </div>
+            </div>`;
+    }
+
+    /**
+     * Generate legend HTML (internal method matching Python API)
+     */
+    static _generateLegendHtml() {
+        return this.generateLegend();
     }
 
     /**
@@ -613,9 +765,16 @@ class UIController {
             this.currentMemoryMap = MemoryMapParser.parse(inputText);
             this.currentStats = MemoryMapAnalyzer.analyze(this.currentMemoryMap);
 
-            // Generate visualizations
+            // Save memory map to pmap-report.map file (optional download)
+            // this.saveMapFile(inputText);
+
+            // Load template from lib/pmap.html.in
             const template = await this.loadReportTemplate();
-            const reportHtml = HTMLGenerator.generateFullReportHtml(this.currentMemoryMap, this.currentStats, template);
+            
+            // Generate HTML using template-based rendering (matching Python API)
+            const reportHtml = HTMLGenerator.generateHtml(this.currentMemoryMap, null, template);
+            
+            // Open report in new window
             const reportWindow = window.open('', '_blank');
 
             if (!reportWindow) {
@@ -640,13 +799,24 @@ class UIController {
             return this.reportTemplate;
         }
 
-        const response = await fetch('pmap.html');
+        const response = await fetch('./pmap.html.in');
         if (!response.ok) {
-            throw new Error('Failed to load report template (pmap.html)');
+            throw new Error('Failed to load report template (./pmap.html.in)');
         }
 
         this.reportTemplate = await response.text();
         return this.reportTemplate;
+    }
+
+    saveMapFile(mapData) {
+        // Save memory map data to pmap-report.map file
+        const blob = new Blob([mapData], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pmap-report.map';
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     loadDemo() {

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMAP2HTML - bash</title>
+    <title>pmap2html - amxrt</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
     <style>
         * {
             margin: 0;
@@ -96,6 +97,61 @@
             font-family: monospace;
         }
 
+        .memory-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 0.85em;
+        }
+
+        .memory-table thead th {
+            background: #2c3e50;
+            color: white;
+            padding: 6px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-left: 3px solid #2c3e50;
+        }
+
+        .memory-table thead th:nth-child(2) {
+            text-align: center;
+        }
+
+        .memory-table td {
+            padding: 3px 8px;
+            border-bottom: 1px solid #ecf0f1;
+            line-height: 1.5;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .files-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            font-size: 0.85em;
+        }
+
+        .files-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 6px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-size: 1.2em;
+        }
+
+        .files-table td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+        }
+
         .segment-group {
             border-bottom: 2px solid #2c3e50;
         }
@@ -111,44 +167,35 @@
             font-weight: bold;
             font-size: 0.95em;
             border-bottom: 2px solid #2c3e50;
+            border-left: 3px solid #2c3e50;
         }
 
-        .segment {
-            padding: 3px 12px;
-            font-size: 0.85em;
-            border-bottom: 1px solid #ecf0f1;
-            line-height: 1.5;
-            white-space: nowrap;
-            min-width: max-content;
-        }
-
-        .segment:last-child {
-            border-bottom: none;
+        .segment-row td {
+            border-left: 3px solid transparent;
         }
 
         .segment-addr {
-            display: inline-block;
-            width: 230px;
             color: #1f2a33;
+            white-space: nowrap;
+            width: 200px;
         }
 
         .segment-perms {
-            display: inline-block;
-            width: 45px;
             font-weight: bold;
             color: #1f2a33;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .segment-type {
-            display: inline-block;
-            width: 65px;
             font-weight: 600;
             color: #1f2a33;
+            white-space: nowrap;
         }
 
         .segment-path {
-            display: inline-block;
             color: #2b2b2b;
+            white-space: nowrap;
         }
 
         .crash-marker {
@@ -213,7 +260,7 @@
         }
 
         .stat-card .value {
-            font-size: 1.4em;
+            font-size: 1em;
             font-weight: bold;
         }
 
@@ -284,214 +331,914 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊  Linux Process Memory Map</h1>
+            <h1>📊 Linux Process Memory Map (/proc)</h1>
             <div class="info">
-                Process: <strong>bash</strong> |
-                PID: <strong>21855</strong> |
-                Generated: <strong>2026-02-01 07:23:46</strong>
+                Process: <strong>amxrt</strong> |
+                PID: <strong>N/A</strong> |
+                Generated: <strong>2026-02-01 10:09:39</strong>
             </div>
         </div>
 
         <div class="content">
             
             <div class="section">
-                <h2 class="section-title">📈 Statistics</h2>
+                <h2 class="section-title">📈 Memory Stats</h2>
                 <div class="stats-grid">
                     
             <div class="stat-card">
                 <h3>Total Segments</h3>
-                <div class="value">31</div>
+                <div class="value">105</div>
             </div> 
             <div class="stat-card">
                 <h3>Total Memory</h3>
-                <div class="value">12.9 MB</div>
+                <div class="value">3.8 MB</div>
             </div> 
-                    <div class="stat-card">
-                        <h3>CODE</h3>
-                        <div class="value">2752 KB</div>
-                    </div> 
-                    <div class="stat-card">
-                        <h3>DATA</h3>
-                        <div class="value">56 KB</div>
-                    </div> 
-                    <div class="stat-card">
-                        <h3>HEAP</h3>
-                        <div class="value">3416 KB</div>
-                    </div> 
-                    <div class="stat-card">
-                        <h3>STACK</h3>
-                        <div class="value">132 KB</div>
-                    </div>
+            <div class="stat-card">
+                <h3>CODE</h3>
+                <div class="value">2620 KB</div>
+            </div> 
+            <div class="stat-card">
+                <h3>DATA</h3>
+                <div class="value">128 KB</div>
+            </div> 
+            <div class="stat-card">
+                <h3>HEAP</h3>
+                <div class="value">724 KB</div>
+            </div> 
+            <div class="stat-card">
+                <h3>BINARIES</h3>
+                <div class="value">32</div>
+            </div> 
+            <div class="stat-card">
+                <h3>STACK</h3>
+                <div class="value">132 KB</div>
+            </div> 
+            <div class="stat-card">
+                <h3>ANON</h3>
+                <div class="value">72 KB</div>
+            </div>
                 </div>
             </div>
 
             
 
+            
             <div class="section">
-                <h2 class="section-title">📊 Memory Layout Visualization</h2>
+                <h2 class="section-title">📁 Files</h2>
+                <div style="overflow-x: auto;">
+                    <table class="files-table">
+                        <thead>
+                            <tr>
+                                <th>File</th>
+                                <th>Segments</th>
+                                <th>Total Size (bytes)</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/lib/ld-linux-armhf.so.3</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">147,456</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/lib/libc.so.6</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">1,261,568</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/lib/libsahtrace.so.v1.15.0</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">16,384</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/lib/libubox.so.20230523</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">45,056</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/lib/libubus.so.20230605</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">28,672</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/bin/amxrt</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">12,288</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">40,960</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">69,632</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/modules/mod-dmext.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">36,864</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/modules/mod-dmproxy.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">40,960</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/modules/mod-sahtrace.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">16,384</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">16,384</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">20,480</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/amx/tr181-device/tr181-device.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">40,960</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxb.so.4.12.3</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">53,248</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxc.so.2.3.8</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">98,304</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxd.so.6.7.6</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">114,688</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxj.so.1.0.4</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">20,480</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxm.so.0.1.1</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">16,384</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxo.so.5.3.10</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">106,496</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxp.so.2.7.14</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">86,016</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxrt.so.0.6.7</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">53,248</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libamxs.so.0.8.3</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">36,864</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libcap-ng.so.0.0.0</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">24,576</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libevent-2.1.so.7.0.1</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">176,128</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libimtp.so.2.2.0</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">24,576</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libprotobuf-c.so</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">24,576</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/liburiparser.so.1.0.30</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">65,536</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libusp.so.2.7.2</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">86,016</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libuspi.so.1.1.0</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">36,864</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libuspprotobuf.so.0.5.2</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">118,784</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                <tr style="background-color: #4CAF5033;">
+                    <td style="border-left: 3px solid #4CAF50;">/usr/lib/libyajl.so.2.1.0</td>
+                    <td class="monospace">3</td>
+                    <td class="monospace">36,864</td>
+                    <td class="monospace">CODE</td>
+                </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📊 Memory Segment</h2>
                 <div class="memory-viz">
                     <div class="memory-scale">
-                        <span class="memory-scale-top">⬇️ High Memory: 0xffffffffff601000</span>
+                        <span class="memory-scale-top">⬇️ Low Memory: 0x000000000098b000</span>
                     </div>
                     <div class="memory-container">
-                        <div class="segment-group"><div class="segment-group-header">Stack</div><div class="segment" style="background-color: #00BCD433; border-left: 3px solid #00BCD4;">
-                <span class="segment-addr">0x7ffe5b8ca000-0x7ffe5b8eb000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>STACK</span></span>
-                <span class="segment-path">[stack]</span>
-            </div></div>
-<div class="segment-group"><div class="segment-group-header">Shared Libraries</div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145ee00000-0x7f145f373000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/locale/locale-archive</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f400000-0x7f145f428000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #4CAF5033; border-left: 3px solid #4CAF50;">
-                <span class="segment-addr">0x7f145f428000-0x7f145f5bd000</span>
-                <span class="segment-perms">r-xp</span>
-                <span class="segment-type"><span>CODE</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f5bd000-0x7f145f615000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #607D8B33; border-left: 3px solid #607D8B;">
-                <span class="segment-addr">0x7f145f615000-0x7f145f616000</span>
-                <span class="segment-perms">---p</span>
-                <span class="segment-type"><span>UNKNOWN</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f616000-0x7f145f61a000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #2196F333; border-left: 3px solid #2196F3;">
-                <span class="segment-addr">0x7f145f61a000-0x7f145f61c000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>DATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libc.so.6</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f6db000-0x7f145f6e9000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</span>
-            </div><div class="segment" style="background-color: #4CAF5033; border-left: 3px solid #4CAF50;">
-                <span class="segment-addr">0x7f145f6e9000-0x7f145f6fa000</span>
-                <span class="segment-perms">r-xp</span>
-                <span class="segment-type"><span>CODE</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f6fa000-0x7f145f708000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f708000-0x7f145f70c000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</span>
-            </div><div class="segment" style="background-color: #2196F333; border-left: 3px solid #2196F3;">
-                <span class="segment-addr">0x7f145f70c000-0x7f145f70d000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>DATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f721000-0x7f145f723000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</span>
-            </div><div class="segment" style="background-color: #4CAF5033; border-left: 3px solid #4CAF50;">
-                <span class="segment-addr">0x7f145f723000-0x7f145f74d000</span>
-                <span class="segment-perms">r-xp</span>
-                <span class="segment-type"><span>CODE</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f74d000-0x7f145f758000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7f145f759000-0x7f145f75b000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</span>
-            </div><div class="segment" style="background-color: #2196F333; border-left: 3px solid #2196F3;">
-                <span class="segment-addr">0x7f145f75b000-0x7f145f75d000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>DATA</span></span>
-                <span class="segment-path">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</span>
-            </div></div>
-<div class="segment-group"><div class="segment-group-header">Heap</div><div class="segment" style="background-color: #F4433633; border-left: 3px solid #F44336;">
-                <span class="segment-addr">0x61fb7e97a000-0x61fb7ecd0000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>HEAP</span></span>
-                <span class="segment-path">[heap]</span>
-            </div></div>
-<div class="segment-group"><div class="segment-group-header">BSS / Data</div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x61fb6f933000-0x61fb6f962000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/bin/bash</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x61fb6fa41000-0x61fb6fa7b000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/bin/bash</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x61fb6fa7c000-0x61fb6fa80000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">/usr/bin/bash</span>
-            </div><div class="segment" style="background-color: #2196F333; border-left: 3px solid #2196F3;">
-                <span class="segment-addr">0x61fb6fa80000-0x61fb6fa89000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>DATA</span></span>
-                <span class="segment-path">/usr/bin/bash</span>
-            </div><div class="segment" style="background-color: #9E9E9E33; border-left: 3px solid #9E9E9E;">
-                <span class="segment-addr">0x61fb6fa89000-0x61fb6fa94000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>ANON</span></span>
-                <span class="segment-path">[anon]</span>
-            </div><div class="segment" style="background-color: #9E9E9E33; border-left: 3px solid #9E9E9E;">
-                <span class="segment-addr">0x7f145f61c000-0x7f145f629000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>ANON</span></span>
-                <span class="segment-path">[anon]</span>
-            </div><div class="segment" style="background-color: #9E9E9E33; border-left: 3px solid #9E9E9E;">
-                <span class="segment-addr">0x7f145f6d8000-0x7f145f6db000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>ANON</span></span>
-                <span class="segment-path">[anon]</span>
-            </div><div class="segment" style="background-color: #9E9E9E33; border-left: 3px solid #9E9E9E;">
-                <span class="segment-addr">0x7f145f71f000-0x7f145f721000</span>
-                <span class="segment-perms">rw-p</span>
-                <span class="segment-type"><span>ANON</span></span>
-                <span class="segment-path">[anon]</span>
-            </div><div class="segment" style="background-color: #9C27B033; border-left: 3px solid #9C27B0;">
-                <span class="segment-addr">0x7ffe5b9fa000-0x7ffe5b9fe000</span>
-                <span class="segment-perms">r--p</span>
-                <span class="segment-type"><span>RODATA</span></span>
-                <span class="segment-path">[vvar]</span>
-            </div></div>
-<div class="segment-group"><div class="segment-group-header">Code (.text)</div><div class="segment" style="background-color: #4CAF5033; border-left: 3px solid #4CAF50;">
-                <span class="segment-addr">0x61fb6f962000-0x61fb6fa41000</span>
-                <span class="segment-perms">r-xp</span>
-                <span class="segment-type"><span>CODE</span></span>
-                <span class="segment-path">/usr/bin/bash</span>
-            </div><div class="segment" style="background-color: #4CAF5033; border-left: 3px solid #4CAF50;">
-                <span class="segment-addr">0xffffffffff600000-0xffffffffff601000</span>
-                <span class="segment-perms">--xp</span>
-                <span class="segment-type"><span>CODE</span></span>
-                <span class="segment-path">[vsyscall]</span>
-            </div></div>
+                        <table class="memory-table">
+                            <thead>
+                                <tr>
+                                    <th>Address Range</th>
+                                    <th>Perms</th>
+                                    <th>Type</th>
+                                    <th>Binary/Mapping</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="segment-group-row"><td class="segment-group-header" colspan="4">Code (.text)</td></tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x000000000098b000-0x000000000098c000 (4.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/bin/amxrt</td>
+            </tr>
+<tr class="segment-group-row"><td class="segment-group-header" colspan="4">BSS / Data</td></tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x000000000098c000-0x000000000098d000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/bin/amxrt</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x000000000098d000-0x000000000098e000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/bin/amxrt</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9E9E9E33;">
+                <td class="segment-addr" style="border-left: 3px solid #9E9E9E;">0x00000000f7a25000-0x00000000f7a27000 (8.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">ANON</td>
+                <td class="segment-path">[anon]</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9E9E9E33;">
+                <td class="segment-addr" style="border-left: 3px solid #9E9E9E;">0x00000000f7b64000-0x00000000f7b70000 (48.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">ANON</td>
+                <td class="segment-path">[anon]</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9E9E9E33;">
+                <td class="segment-addr" style="border-left: 3px solid #9E9E9E;">0x00000000f7bf0000-0x00000000f7bf2000 (8.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">ANON</td>
+                <td class="segment-path">[anon]</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9E9E9E33;">
+                <td class="segment-addr" style="border-left: 3px solid #9E9E9E;">0x00000000f7c3e000-0x00000000f7c40000 (8.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">ANON</td>
+                <td class="segment-path">[anon]</td>
+            </tr>
+<tr class="segment-group-row"><td class="segment-group-header" colspan="4">Heap</td></tr>
+<tr class="segment-row" style="background-color: #F4433633;">
+                <td class="segment-addr" style="border-left: 3px solid #F44336;">0x000000000214f000-0x000000000218a000 (236.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">HEAP</td>
+                <td class="segment-path">[heap]</td>
+            </tr>
+<tr class="segment-row" style="background-color: #F4433633;">
+                <td class="segment-addr" style="border-left: 3px solid #F44336;">0x000000000218a000-0x0000000002204000 (488.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">HEAP</td>
+                <td class="segment-path">[heap]</td>
+            </tr>
+<tr class="segment-group-row"><td class="segment-group-header" colspan="4">Shared Libraries</td></tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f797f000-0x00000000f7982000 (12.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7982000-0x00000000f7983000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7983000-0x00000000f7984000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7984000-0x00000000f7986000 (8.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7986000-0x00000000f7987000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7987000-0x00000000f7988000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7988000-0x00000000f798c000 (16.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libprotobuf-c.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f798c000-0x00000000f798d000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libprotobuf-c.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f798d000-0x00000000f798e000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libprotobuf-c.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f798e000-0x00000000f79a4000 (88.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libuspprotobuf.so.0.5.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79a4000-0x00000000f79aa000 (24.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libuspprotobuf.so.0.5.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79aa000-0x00000000f79ab000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libuspprotobuf.so.0.5.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79ab000-0x00000000f79b2000 (28.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libuspi.so.1.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79b2000-0x00000000f79b3000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libuspi.so.1.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79b3000-0x00000000f79b4000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libuspi.so.1.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79b4000-0x00000000f79c7000 (76.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libusp.so.2.7.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79c7000-0x00000000f79c8000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libusp.so.2.7.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79c8000-0x00000000f79c9000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libusp.so.2.7.2</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79c9000-0x00000000f79cd000 (16.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libimtp.so.2.2.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79cd000-0x00000000f79ce000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libimtp.so.2.2.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79ce000-0x00000000f79cf000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libimtp.so.2.2.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79cf000-0x00000000f79de000 (60.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79de000-0x00000000f79df000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79df000-0x00000000f79e0000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79e0000-0x00000000f79e5000 (20.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/lib/libubus.so.20230605</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79e5000-0x00000000f79e6000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/lib/libubus.so.20230605</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79e6000-0x00000000f79e7000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/lib/libubus.so.20230605</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79e7000-0x00000000f79f0000 (36.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/lib/libubox.so.20230523</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79f0000-0x00000000f79f1000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/lib/libubox.so.20230523</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79f1000-0x00000000f79f2000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/lib/libubox.so.20230523</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79f2000-0x00000000f79fa000 (32.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79fa000-0x00000000f79fb000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79fb000-0x00000000f79fc000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f79fc000-0x00000000f79fe000 (8.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxm.so.0.1.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f79fe000-0x00000000f79ff000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxm.so.0.1.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f79ff000-0x00000000f7a00000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxm.so.0.1.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a00000-0x00000000f7a08000 (32.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/tr181-device.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a08000-0x00000000f7a09000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/tr181-device.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a09000-0x00000000f7a0a000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/tr181-device/tr181-device.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a0a000-0x00000000f7a12000 (32.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmproxy.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a12000-0x00000000f7a13000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmproxy.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a13000-0x00000000f7a14000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmproxy.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a14000-0x00000000f7a1b000 (28.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmext.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a1b000-0x00000000f7a1c000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmext.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a1c000-0x00000000f7a1d000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-dmext.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a1d000-0x00000000f7a1f000 (8.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/lib/libsahtrace.so.v1.15.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a1f000-0x00000000f7a20000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/lib/libsahtrace.so.v1.15.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a20000-0x00000000f7a21000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/lib/libsahtrace.so.v1.15.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a21000-0x00000000f7a23000 (8.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-sahtrace.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a23000-0x00000000f7a24000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-sahtrace.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a24000-0x00000000f7a25000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/amx/modules/mod-sahtrace.so</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a27000-0x00000000f7a2e000 (28.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxs.so.0.8.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7a2e000-0x00000000f7a2f000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxs.so.0.8.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7a2f000-0x00000000f7a30000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxs.so.0.8.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7a30000-0x00000000f7b61000 (1.19 MB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/lib/libc.so.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7b61000-0x00000000f7b63000 (8.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/lib/libc.so.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7b63000-0x00000000f7b64000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/lib/libc.so.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7b70000-0x00000000f7b99000 (164.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libevent-2.1.so.7.0.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7b99000-0x00000000f7b9a000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libevent-2.1.so.7.0.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7b9a000-0x00000000f7b9b000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libevent-2.1.so.7.0.1</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7b9b000-0x00000000f7ba6000 (44.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxrt.so.0.6.7</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7ba6000-0x00000000f7ba7000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxrt.so.0.6.7</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7ba7000-0x00000000f7ba8000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxrt.so.0.6.7</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7ba8000-0x00000000f7bb3000 (44.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxb.so.4.12.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7bb3000-0x00000000f7bb4000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxb.so.4.12.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7bb4000-0x00000000f7bb5000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxb.so.4.12.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7bb5000-0x00000000f7bcd000 (96.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxo.so.5.3.10</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7bcd000-0x00000000f7bce000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxo.so.5.3.10</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7bce000-0x00000000f7bcf000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxo.so.5.3.10</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7bcf000-0x00000000f7be9000 (104.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxd.so.6.7.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7be9000-0x00000000f7bea000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxd.so.6.7.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7bea000-0x00000000f7beb000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxd.so.6.7.6</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7beb000-0x00000000f7bee000 (12.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxj.so.1.0.4</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7bee000-0x00000000f7bef000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxj.so.1.0.4</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7bef000-0x00000000f7bf0000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxj.so.1.0.4</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7bf2000-0x00000000f7c05000 (76.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxp.so.2.7.14</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c05000-0x00000000f7c06000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxp.so.2.7.14</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c06000-0x00000000f7c07000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxp.so.2.7.14</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7c07000-0x00000000f7c1d000 (88.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libamxc.so.2.3.8</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c1d000-0x00000000f7c1e000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libamxc.so.2.3.8</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c1e000-0x00000000f7c1f000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libamxc.so.2.3.8</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7c1f000-0x00000000f7c23000 (16.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libcap-ng.so.0.0.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c23000-0x00000000f7c24000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libcap-ng.so.0.0.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c24000-0x00000000f7c25000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libcap-ng.so.0.0.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7c25000-0x00000000f7c33000 (56.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/liburiparser.so.1.0.30</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c33000-0x00000000f7c34000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/liburiparser.so.1.0.30</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c34000-0x00000000f7c35000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/liburiparser.so.1.0.30</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7c35000-0x00000000f7c3c000 (28.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/usr/lib/libyajl.so.2.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c3c000-0x00000000f7c3d000 (4.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/usr/lib/libyajl.so.2.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c3d000-0x00000000f7c3e000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/usr/lib/libyajl.so.2.1.0</td>
+            </tr>
+<tr class="segment-row" style="background-color: #4CAF5033;">
+                <td class="segment-addr" style="border-left: 3px solid #4CAF50;">0x00000000f7c41000-0x00000000f7c62000 (132.00 KB)</td>
+                <td class="segment-perms">r-xp</td>
+                <td class="segment-type">CODE</td>
+                <td class="segment-path">/lib/ld-linux-armhf.so.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #9C27B033;">
+                <td class="segment-addr" style="border-left: 3px solid #9C27B0;">0x00000000f7c62000-0x00000000f7c64000 (8.00 KB)</td>
+                <td class="segment-perms">r--p</td>
+                <td class="segment-type">RODATA</td>
+                <td class="segment-path">/lib/ld-linux-armhf.so.3</td>
+            </tr>
+<tr class="segment-row" style="background-color: #2196F333;">
+                <td class="segment-addr" style="border-left: 3px solid #2196F3;">0x00000000f7c64000-0x00000000f7c65000 (4.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">DATA</td>
+                <td class="segment-path">/lib/ld-linux-armhf.so.3</td>
+            </tr>
+<tr class="segment-group-row"><td class="segment-group-header" colspan="4">Stack</td></tr>
+<tr class="segment-row" style="background-color: #00BCD433;">
+                <td class="segment-addr" style="border-left: 3px solid #00BCD4;">0x00000000ff8a0000-0x00000000ff8c1000 (132.00 KB)</td>
+                <td class="segment-perms">rw-p</td>
+                <td class="segment-type">STACK</td>
+                <td class="segment-path">[stack]</td>
+            </tr>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="memory-scale">
-                        <span class="memory-scale-bottom">⬆️ Low Memory: 0x000061fb6f933000</span>
+                        <span class="memory-scale-bottom">⬆️ High Memory: 0x00000000ffff1000</span>
                     </div>
                     <div class="legend">
                         
@@ -545,7 +1292,7 @@
 
             
             <div class="section">
-                <h2 class="section-title">📋 Detailed Segment Table</h2>
+                <h2 class="section-title">📋 Detailed Segment</h2>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
@@ -561,252 +1308,844 @@
                         <tbody>
                             
                 <tr>
-                    <td class="monospace">0x000061fb6f933000</td>
-                    <td class="monospace">0x000061fb6f962000</td>
-                    <td>192,512</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/bin/bash</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x000061fb6f962000</td>
-                    <td class="monospace">0x000061fb6fa41000</td>
-                    <td>913,408</td>
+                    <td class="monospace">0x000000000098b000</td>
+                    <td class="monospace">0x000000000098c000</td>
+                    <td>4,096</td>
                     <td class="monospace">r-xp</td>
                     <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
-                    <td style="font-size: 0.85em;">/usr/bin/bash</td>
+                    <td style="font-size: 0.85em;">/usr/bin/amxrt</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x000061fb6fa41000</td>
-                    <td class="monospace">0x000061fb6fa7b000</td>
-                    <td>237,568</td>
+                    <td class="monospace">0x000000000098c000</td>
+                    <td class="monospace">0x000000000098d000</td>
+                    <td>4,096</td>
                     <td class="monospace">r--p</td>
                     <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/bin/bash</td>
+                    <td style="font-size: 0.85em;">/usr/bin/amxrt</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x000061fb6fa7c000</td>
-                    <td class="monospace">0x000061fb6fa80000</td>
-                    <td>16,384</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/bin/bash</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x000061fb6fa80000</td>
-                    <td class="monospace">0x000061fb6fa89000</td>
-                    <td>36,864</td>
+                    <td class="monospace">0x000000000098d000</td>
+                    <td class="monospace">0x000000000098e000</td>
+                    <td>4,096</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
-                    <td style="font-size: 0.85em;">/usr/bin/bash</td>
+                    <td style="font-size: 0.85em;">/usr/bin/amxrt</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x000061fb6fa89000</td>
-                    <td class="monospace">0x000061fb6fa94000</td>
-                    <td>45,056</td>
-                    <td class="monospace">rw-p</td>
-                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
-                    <td style="font-size: 0.85em;">[anon]</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x000061fb7e97a000</td>
-                    <td class="monospace">0x000061fb7ecd0000</td>
-                    <td>3,497,984</td>
+                    <td class="monospace">0x000000000214f000</td>
+                    <td class="monospace">0x000000000218a000</td>
+                    <td>241,664</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #F44336; font-weight: bold;">●</span> HEAP</td>
                     <td style="font-size: 0.85em;">[heap]</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145ee00000</td>
-                    <td class="monospace">0x00007f145f373000</td>
-                    <td>5,713,920</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/locale/locale-archive</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f400000</td>
-                    <td class="monospace">0x00007f145f428000</td>
-                    <td>163,840</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f428000</td>
-                    <td class="monospace">0x00007f145f5bd000</td>
-                    <td>1,658,880</td>
-                    <td class="monospace">r-xp</td>
-                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f5bd000</td>
-                    <td class="monospace">0x00007f145f615000</td>
-                    <td>360,448</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f615000</td>
-                    <td class="monospace">0x00007f145f616000</td>
-                    <td>4,096</td>
-                    <td class="monospace">---p</td>
-                    <td><span style="color: #607D8B; font-weight: bold;">●</span> UNKNOWN</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f616000</td>
-                    <td class="monospace">0x00007f145f61a000</td>
-                    <td>16,384</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f61a000</td>
-                    <td class="monospace">0x00007f145f61c000</td>
-                    <td>8,192</td>
+                    <td class="monospace">0x000000000218a000</td>
+                    <td class="monospace">0x0000000002204000</td>
+                    <td>499,712</td>
                     <td class="monospace">rw-p</td>
-                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libc.so.6</td>
+                    <td><span style="color: #F44336; font-weight: bold;">●</span> HEAP</td>
+                    <td style="font-size: 0.85em;">[heap]</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f61c000</td>
-                    <td class="monospace">0x00007f145f629000</td>
-                    <td>53,248</td>
-                    <td class="monospace">rw-p</td>
-                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
-                    <td style="font-size: 0.85em;">[anon]</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f6d8000</td>
-                    <td class="monospace">0x00007f145f6db000</td>
+                    <td class="monospace">0x00000000f797f000</td>
+                    <td class="monospace">0x00000000f7982000</td>
                     <td>12,288</td>
-                    <td class="monospace">rw-p</td>
-                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
-                    <td style="font-size: 0.85em;">[anon]</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f6db000</td>
-                    <td class="monospace">0x00007f145f6e9000</td>
-                    <td>57,344</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f6e9000</td>
-                    <td class="monospace">0x00007f145f6fa000</td>
-                    <td>69,632</td>
                     <td class="monospace">r-xp</td>
                     <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f6fa000</td>
-                    <td class="monospace">0x00007f145f708000</td>
-                    <td>57,344</td>
+                    <td class="monospace">0x00000000f7982000</td>
+                    <td class="monospace">0x00000000f7983000</td>
+                    <td>4,096</td>
                     <td class="monospace">r--p</td>
                     <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f708000</td>
-                    <td class="monospace">0x00007f145f70c000</td>
-                    <td>16,384</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f70c000</td>
-                    <td class="monospace">0x00007f145f70d000</td>
+                    <td class="monospace">0x00000000f7983000</td>
+                    <td class="monospace">0x00000000f7984000</td>
                     <td>4,096</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/libtinfo.so.6.3</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-device-mgmnt.so</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f71f000</td>
-                    <td class="monospace">0x00007f145f721000</td>
+                    <td class="monospace">0x00000000f7984000</td>
+                    <td class="monospace">0x00000000f7986000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7986000</td>
+                    <td class="monospace">0x00000000f7987000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7987000</td>
+                    <td class="monospace">0x00000000f7988000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/modules/mod-debug-info.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7988000</td>
+                    <td class="monospace">0x00000000f798c000</td>
+                    <td>16,384</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libprotobuf-c.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f798c000</td>
+                    <td class="monospace">0x00000000f798d000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libprotobuf-c.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f798d000</td>
+                    <td class="monospace">0x00000000f798e000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libprotobuf-c.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f798e000</td>
+                    <td class="monospace">0x00000000f79a4000</td>
+                    <td>90,112</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspprotobuf.so.0.5.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79a4000</td>
+                    <td class="monospace">0x00000000f79aa000</td>
+                    <td>24,576</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspprotobuf.so.0.5.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79aa000</td>
+                    <td class="monospace">0x00000000f79ab000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspprotobuf.so.0.5.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79ab000</td>
+                    <td class="monospace">0x00000000f79b2000</td>
+                    <td>28,672</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspi.so.1.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79b2000</td>
+                    <td class="monospace">0x00000000f79b3000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspi.so.1.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79b3000</td>
+                    <td class="monospace">0x00000000f79b4000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libuspi.so.1.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79b4000</td>
+                    <td class="monospace">0x00000000f79c7000</td>
+                    <td>77,824</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libusp.so.2.7.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79c7000</td>
+                    <td class="monospace">0x00000000f79c8000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libusp.so.2.7.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79c8000</td>
+                    <td class="monospace">0x00000000f79c9000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libusp.so.2.7.2</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79c9000</td>
+                    <td class="monospace">0x00000000f79cd000</td>
+                    <td>16,384</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libimtp.so.2.2.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79cd000</td>
+                    <td class="monospace">0x00000000f79ce000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libimtp.so.2.2.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79ce000</td>
+                    <td class="monospace">0x00000000f79cf000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libimtp.so.2.2.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79cf000</td>
+                    <td class="monospace">0x00000000f79de000</td>
+                    <td>61,440</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79de000</td>
+                    <td class="monospace">0x00000000f79df000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79df000</td>
+                    <td class="monospace">0x00000000f79e0000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/usp/mod-amxb-usp.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79e0000</td>
+                    <td class="monospace">0x00000000f79e5000</td>
+                    <td>20,480</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/lib/libubus.so.20230605</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79e5000</td>
+                    <td class="monospace">0x00000000f79e6000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/lib/libubus.so.20230605</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79e6000</td>
+                    <td class="monospace">0x00000000f79e7000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/lib/libubus.so.20230605</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79e7000</td>
+                    <td class="monospace">0x00000000f79f0000</td>
+                    <td>36,864</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/lib/libubox.so.20230523</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79f0000</td>
+                    <td class="monospace">0x00000000f79f1000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/lib/libubox.so.20230523</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79f1000</td>
+                    <td class="monospace">0x00000000f79f2000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/lib/libubox.so.20230523</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79f2000</td>
+                    <td class="monospace">0x00000000f79fa000</td>
+                    <td>32,768</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79fa000</td>
+                    <td class="monospace">0x00000000f79fb000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79fb000</td>
+                    <td class="monospace">0x00000000f79fc000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/bin/mods/amxb/05-mod-amxb-ubus.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79fc000</td>
+                    <td class="monospace">0x00000000f79fe000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxm.so.0.1.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79fe000</td>
+                    <td class="monospace">0x00000000f79ff000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxm.so.0.1.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f79ff000</td>
+                    <td class="monospace">0x00000000f7a00000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxm.so.0.1.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a00000</td>
+                    <td class="monospace">0x00000000f7a08000</td>
+                    <td>32,768</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/tr181-device.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a08000</td>
+                    <td class="monospace">0x00000000f7a09000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/tr181-device.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a09000</td>
+                    <td class="monospace">0x00000000f7a0a000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/tr181-device/tr181-device.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a0a000</td>
+                    <td class="monospace">0x00000000f7a12000</td>
+                    <td>32,768</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmproxy.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a12000</td>
+                    <td class="monospace">0x00000000f7a13000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmproxy.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a13000</td>
+                    <td class="monospace">0x00000000f7a14000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmproxy.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a14000</td>
+                    <td class="monospace">0x00000000f7a1b000</td>
+                    <td>28,672</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmext.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a1b000</td>
+                    <td class="monospace">0x00000000f7a1c000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmext.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a1c000</td>
+                    <td class="monospace">0x00000000f7a1d000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-dmext.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a1d000</td>
+                    <td class="monospace">0x00000000f7a1f000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/lib/libsahtrace.so.v1.15.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a1f000</td>
+                    <td class="monospace">0x00000000f7a20000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/lib/libsahtrace.so.v1.15.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a20000</td>
+                    <td class="monospace">0x00000000f7a21000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/lib/libsahtrace.so.v1.15.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a21000</td>
+                    <td class="monospace">0x00000000f7a23000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-sahtrace.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a23000</td>
+                    <td class="monospace">0x00000000f7a24000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-sahtrace.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a24000</td>
+                    <td class="monospace">0x00000000f7a25000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/amx/modules/mod-sahtrace.so</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7a25000</td>
+                    <td class="monospace">0x00000000f7a27000</td>
                     <td>8,192</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
                     <td style="font-size: 0.85em;">[anon]</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f721000</td>
-                    <td class="monospace">0x00007f145f723000</td>
-                    <td>8,192</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f723000</td>
-                    <td class="monospace">0x00007f145f74d000</td>
-                    <td>172,032</td>
+                    <td class="monospace">0x00000000f7a27000</td>
+                    <td class="monospace">0x00000000f7a2e000</td>
+                    <td>28,672</td>
                     <td class="monospace">r-xp</td>
                     <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxs.so.0.8.3</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f74d000</td>
-                    <td class="monospace">0x00007f145f758000</td>
-                    <td>45,056</td>
+                    <td class="monospace">0x00000000f7a2e000</td>
+                    <td class="monospace">0x00000000f7a2f000</td>
+                    <td>4,096</td>
                     <td class="monospace">r--p</td>
                     <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxs.so.0.8.3</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007f145f759000</td>
-                    <td class="monospace">0x00007f145f75b000</td>
-                    <td>8,192</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007f145f75b000</td>
-                    <td class="monospace">0x00007f145f75d000</td>
-                    <td>8,192</td>
+                    <td class="monospace">0x00000000f7a2f000</td>
+                    <td class="monospace">0x00000000f7a30000</td>
+                    <td>4,096</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
-                    <td style="font-size: 0.85em;">/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxs.so.0.8.3</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007ffe5b8ca000</td>
-                    <td class="monospace">0x00007ffe5b8eb000</td>
+                    <td class="monospace">0x00000000f7a30000</td>
+                    <td class="monospace">0x00000000f7b61000</td>
+                    <td>1,249,280</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/lib/libc.so.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b61000</td>
+                    <td class="monospace">0x00000000f7b63000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/lib/libc.so.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b63000</td>
+                    <td class="monospace">0x00000000f7b64000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/lib/libc.so.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b64000</td>
+                    <td class="monospace">0x00000000f7b70000</td>
+                    <td>49,152</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
+                    <td style="font-size: 0.85em;">[anon]</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b70000</td>
+                    <td class="monospace">0x00000000f7b99000</td>
+                    <td>167,936</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libevent-2.1.so.7.0.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b99000</td>
+                    <td class="monospace">0x00000000f7b9a000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libevent-2.1.so.7.0.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b9a000</td>
+                    <td class="monospace">0x00000000f7b9b000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libevent-2.1.so.7.0.1</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7b9b000</td>
+                    <td class="monospace">0x00000000f7ba6000</td>
+                    <td>45,056</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxrt.so.0.6.7</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7ba6000</td>
+                    <td class="monospace">0x00000000f7ba7000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxrt.so.0.6.7</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7ba7000</td>
+                    <td class="monospace">0x00000000f7ba8000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxrt.so.0.6.7</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7ba8000</td>
+                    <td class="monospace">0x00000000f7bb3000</td>
+                    <td>45,056</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxb.so.4.12.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bb3000</td>
+                    <td class="monospace">0x00000000f7bb4000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxb.so.4.12.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bb4000</td>
+                    <td class="monospace">0x00000000f7bb5000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxb.so.4.12.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bb5000</td>
+                    <td class="monospace">0x00000000f7bcd000</td>
+                    <td>98,304</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxo.so.5.3.10</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bcd000</td>
+                    <td class="monospace">0x00000000f7bce000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxo.so.5.3.10</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bce000</td>
+                    <td class="monospace">0x00000000f7bcf000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxo.so.5.3.10</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bcf000</td>
+                    <td class="monospace">0x00000000f7be9000</td>
+                    <td>106,496</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxd.so.6.7.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7be9000</td>
+                    <td class="monospace">0x00000000f7bea000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxd.so.6.7.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bea000</td>
+                    <td class="monospace">0x00000000f7beb000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxd.so.6.7.6</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7beb000</td>
+                    <td class="monospace">0x00000000f7bee000</td>
+                    <td>12,288</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxj.so.1.0.4</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bee000</td>
+                    <td class="monospace">0x00000000f7bef000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxj.so.1.0.4</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bef000</td>
+                    <td class="monospace">0x00000000f7bf0000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxj.so.1.0.4</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bf0000</td>
+                    <td class="monospace">0x00000000f7bf2000</td>
+                    <td>8,192</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
+                    <td style="font-size: 0.85em;">[anon]</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7bf2000</td>
+                    <td class="monospace">0x00000000f7c05000</td>
+                    <td>77,824</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxp.so.2.7.14</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c05000</td>
+                    <td class="monospace">0x00000000f7c06000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxp.so.2.7.14</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c06000</td>
+                    <td class="monospace">0x00000000f7c07000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxp.so.2.7.14</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c07000</td>
+                    <td class="monospace">0x00000000f7c1d000</td>
+                    <td>90,112</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxc.so.2.3.8</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c1d000</td>
+                    <td class="monospace">0x00000000f7c1e000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxc.so.2.3.8</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c1e000</td>
+                    <td class="monospace">0x00000000f7c1f000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libamxc.so.2.3.8</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c1f000</td>
+                    <td class="monospace">0x00000000f7c23000</td>
+                    <td>16,384</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libcap-ng.so.0.0.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c23000</td>
+                    <td class="monospace">0x00000000f7c24000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libcap-ng.so.0.0.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c24000</td>
+                    <td class="monospace">0x00000000f7c25000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libcap-ng.so.0.0.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c25000</td>
+                    <td class="monospace">0x00000000f7c33000</td>
+                    <td>57,344</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/liburiparser.so.1.0.30</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c33000</td>
+                    <td class="monospace">0x00000000f7c34000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/liburiparser.so.1.0.30</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c34000</td>
+                    <td class="monospace">0x00000000f7c35000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/liburiparser.so.1.0.30</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c35000</td>
+                    <td class="monospace">0x00000000f7c3c000</td>
+                    <td>28,672</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libyajl.so.2.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c3c000</td>
+                    <td class="monospace">0x00000000f7c3d000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libyajl.so.2.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c3d000</td>
+                    <td class="monospace">0x00000000f7c3e000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/usr/lib/libyajl.so.2.1.0</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c3e000</td>
+                    <td class="monospace">0x00000000f7c40000</td>
+                    <td>8,192</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #9E9E9E; font-weight: bold;">●</span> ANON</td>
+                    <td style="font-size: 0.85em;">[anon]</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c40000</td>
+                    <td class="monospace">0x00000000f7c41000</td>
+                    <td>4,096</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #795548; font-weight: bold;">●</span> VDSO</td>
+                    <td style="font-size: 0.85em;">[sigpage]</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c41000</td>
+                    <td class="monospace">0x00000000f7c62000</td>
+                    <td>135,168</td>
+                    <td class="monospace">r-xp</td>
+                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
+                    <td style="font-size: 0.85em;">/lib/ld-linux-armhf.so.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c62000</td>
+                    <td class="monospace">0x00000000f7c64000</td>
+                    <td>8,192</td>
+                    <td class="monospace">r--p</td>
+                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
+                    <td style="font-size: 0.85em;">/lib/ld-linux-armhf.so.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000f7c64000</td>
+                    <td class="monospace">0x00000000f7c65000</td>
+                    <td>4,096</td>
+                    <td class="monospace">rw-p</td>
+                    <td><span style="color: #2196F3; font-weight: bold;">●</span> DATA</td>
+                    <td style="font-size: 0.85em;">/lib/ld-linux-armhf.so.3</td>
+                </tr>
+                <tr>
+                    <td class="monospace">0x00000000ff8a0000</td>
+                    <td class="monospace">0x00000000ff8c1000</td>
                     <td>135,168</td>
                     <td class="monospace">rw-p</td>
                     <td><span style="color: #00BCD4; font-weight: bold;">●</span> STACK</td>
                     <td style="font-size: 0.85em;">[stack]</td>
                 </tr>
                 <tr>
-                    <td class="monospace">0x00007ffe5b9fa000</td>
-                    <td class="monospace">0x00007ffe5b9fe000</td>
-                    <td>16,384</td>
-                    <td class="monospace">r--p</td>
-                    <td><span style="color: #9C27B0; font-weight: bold;">●</span> RODATA</td>
-                    <td style="font-size: 0.85em;">[vvar]</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0x00007ffe5b9fe000</td>
-                    <td class="monospace">0x00007ffe5ba00000</td>
-                    <td>8,192</td>
+                    <td class="monospace">0x00000000ffff0000</td>
+                    <td class="monospace">0x00000000ffff1000</td>
+                    <td>4,096</td>
                     <td class="monospace">r-xp</td>
                     <td><span style="color: #795548; font-weight: bold;">●</span> VDSO</td>
-                    <td style="font-size: 0.85em;">[vdso]</td>
-                </tr>
-                <tr>
-                    <td class="monospace">0xffffffffff600000</td>
-                    <td class="monospace">0xffffffffff601000</td>
-                    <td>4,096</td>
-                    <td class="monospace">--xp</td>
-                    <td><span style="color: #4CAF50; font-weight: bold;">●</span> CODE</td>
-                    <td style="font-size: 0.85em;">[vsyscall]</td>
+                    <td style="font-size: 0.85em;">[vectors]</td>
                 </tr>
                         </tbody>
                     </table>
@@ -815,7 +2154,7 @@
         </div>
 
         <div class="footer">
-            Generated by Process Map Analyzer v1.0
+            Generated by PMAP2HTML-v1.0
         </div>
     </div>
 </body>

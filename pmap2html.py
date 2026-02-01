@@ -133,6 +133,9 @@ def main():
     
     # Generate HTML
     HTMLGenerator.generate_html(memmap, crash_ctx, html_output)
+    
+    # Link output file to report.html for easy access
+    HTMLGenerator.link_to_report(html_output)
 
 
 if __name__ == '__main__':
