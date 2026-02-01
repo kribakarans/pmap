@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMAP2HTML</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Linux Process Memory Map Visualiser</h1>
+            <p class="subtitle">Visualize Linux process memory dumps interactively</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Input Section -->
+            <section id="inputSection" class="section input-section">
+                <h2 class="section-title">Load Memory Map</h2>
+                
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="upload">File Upload</button>
+                    <button class="tab-btn" data-tab="paste">Paste Text</button>
+                </div>
+
+                <!-- File Upload Tab -->
+                <div id="uploadTab" class="tab-content active">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p>Drag and drop a <code>.maps</code> file here</p>
+                        <p class="or">or</p>
+                        <button class="btn btn-primary" id="fileSelectBtn">Select File</button>
+                        <input type="file" id="fileInput" accept=".txt,.maps" style="display:none;">
+                        <p class="hint">Accepted formats: .txt, .maps (from /proc/&lt;pid&gt;/maps)</p>
+                    </div>
+                    <div id="uploadFileName" class="file-name" aria-live="polite"></div>
+                </div>
+
+                <!-- Paste Tab -->
+                <div id="pasteTab" class="tab-content">
+                    <div class="paste-area">
+                        <textarea 
+                            id="pasteInput" 
+                            class="paste-input" 
+                            placeholder="Paste memory map dump here (from /proc/&lt;pid&gt;/maps)&#10;Example:&#10;0098b000-0098c000 r-xp 00000000 b3:04 6081                               /usr/bin/systemd&#10;0098c000-0098d000 r--p 00000000 b3:04 6081                               /usr/bin/systemd"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="input-buttons">
+                    <button class="btn btn-secondary" id="clearBtn">Clear</button>
+                    <button class="btn btn-primary" id="demoBtn">Demo</button>
+                    <button class="btn btn-success btn-lg" id="visualiseBtn">Visualise</button>
+                </div>
+
+                <!-- Status Message -->
+                <div id="statusMsg" class="status-message" style="display:none;"></div>
+            </section>
+
+            <!-- Help Section -->
+            <section class="section help-section">
+                <h2 class="section-title">How to Use</h2>
+                <div class="help-content">
+                    <p><strong>Step 1:</strong> Get your memory map from a running process or file:</p>
+                    <code>cat /proc/&lt;pid&gt;/maps &gt; dump.txt</code>
+                    
+                    <p><strong>Step 2:</strong> Upload the file or paste the content above</p>
+                    
+                    <p><strong>Step 3:</strong> Click "Visualise" to analyze the memory layout</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>PMAP2HTML v1.0 | <a href="https://github.com/kribakarans/pmap/" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

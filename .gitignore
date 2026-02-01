@@ -2,6 +2,5 @@
 *.out
 *.maps
 *.regs
-*.html
 crash_demo
 __pycache__
